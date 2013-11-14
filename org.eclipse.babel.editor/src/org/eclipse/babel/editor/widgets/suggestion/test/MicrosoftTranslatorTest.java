@@ -18,7 +18,7 @@ public class MicrosoftTranslatorTest {
 			"interface objects that allow the user to enter and modify text." +
 			" Text controls can be either single or multi-line."; 
 			
-	String targetLanguage = "GERMAN";
+	String targetLanguage = "de";
 	
 	String translatedText = "Instanzen dieser Klasse sind wählbar " +
 			"Benutzer-Interface-Objekte, mit denen den Benutzer eingeben " +
@@ -46,30 +46,33 @@ public class MicrosoftTranslatorTest {
 		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),"icons/mt16.png"),translatedText);
 		
 		assertNotNull(actual);
-		assertEquals(expected.getText(), actual.getText());
-		assertEquals(expected.getIcon().getImageData(),actual.getIcon().getImageData());
+		assertEquals(expected.getText(), actual.getText());		
 	}
 	
-	@Test (expected = NullPointerException.class)
+	@Test
+	public void testGetSuggestionWithTargetLanguageInUpperCase() {
+		Suggestion actual = mtp.getSuggestion(originalText, "DE");
+		
+		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),"icons/mt16.png"),translatedText);
+		
+		assertNotNull(actual);
+		assertEquals(expected.getText(), actual.getText());		
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void testGetSuggestionWithWrongLanguage() {
+		mtp.getSuggestion(originalText, "foo");
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
 	public void testGetSuggestionWithNullParameter() {
 		mtp.getSuggestion(null, null);
-		
-//		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),"icons/mt16.png"),translatedText);
-//		
-//		assertNotNull(actual);
-//		assertEquals(expected.getText(), actual.getText());
-//		assertEquals(expected.getIcon().getImageData(),actual.getIcon().getImageData());
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void testGetSuggestionShouldThrowIllegalArgumentException() {
 		mtp.getSuggestion("", "");
 		
-//		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),"icons/mt16.png"),translatedText);
-//		
-//		assertNotNull(actual);
-//		assertEquals(expected.getText(), actual.getText());
-//		assertEquals(expected.getIcon().getImageData(),actual.getIcon().getImageData());
 	}
 
 }
