@@ -182,7 +182,7 @@ public abstract class AbstractI18NEntry extends Composite {
      */
     private void createTextbox() {
         textBox = new NullableText(this, SWT.MULTI | SWT.WRAP | SWT.H_SCROLL
-                | SWT.V_SCROLL | SWT.BORDER);
+                | SWT.V_SCROLL | SWT.BORDER, locale);
         textBox.setEnabled(false);
         textBox.setOrientation(UIUtils.getOrientation(locale));
 

@@ -1,9 +1,9 @@
 package org.eclipse.babel.editor.widgets.suggestion.provider;
 
+import org.eclipse.babel.editor.util.UIUtils;
 import org.eclipse.babel.editor.widgets.suggestion.ISuggestionProvider;
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import com.memetix.mst.language.Language;
 import com.memetix.mst.translate.Translate;
 
@@ -16,7 +16,8 @@ public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 	public MicrosoftTranslatorProvider(){
 		Translate.setClientId(CUSTOMER_ID);
 		Translate.setClientSecret(ACCOUNT_KEY);
-		icon = new Image(Display.getCurrent(),"icons/mt16.png");
+		icon = UIUtils.getImageDescriptor("mt16.png").createImage();
+//		icon = new Image(Display.getCurrent(),"icons/mt16.png");
 	}
 
 
@@ -76,7 +77,7 @@ public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 	 * */
 	@Override
 	public Suggestion getSuggestion(String original, String targetLanguage) {
-
+		
 		if(original == null || targetLanguage == null ||
 				original.equals("") || targetLanguage.equals("")){
 			throw new IllegalArgumentException();
@@ -89,6 +90,10 @@ public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 		} catch (Exception e) {
 			//TODO logging 
 			throw new IllegalArgumentException();
+		}
+		
+		if(translatedText.toLowerCase().contains("exception")){
+			return new Suggestion(icon,"No suggestions available");
 		}
 
 		return new Suggestion(icon,translatedText);

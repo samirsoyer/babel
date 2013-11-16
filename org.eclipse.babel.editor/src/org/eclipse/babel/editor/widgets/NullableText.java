@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.babel.editor.widgets;
 
+import java.util.Locale;
 import java.util.Stack;
 
 import org.eclipse.babel.editor.util.UIUtils;
+import org.eclipse.babel.editor.widgets.suggestion.SuggestionBubble;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -38,6 +40,7 @@ public class NullableText extends Composite {
     private final Text text;
     private final Color defaultColor;
     private final Color nullColor;
+    private Locale locale;
 
     private boolean isnull;
 
@@ -60,7 +63,7 @@ public class NullableText extends Composite {
     /**
      * Constructor.
      */
-    public NullableText(Composite parent, int style) {
+    public NullableText(Composite parent, int style, Locale locale) {
         super(parent, SWT.NONE);
         text = new Text(this, style);
         text.setData("UNDO", new Stack<String>());
@@ -78,6 +81,15 @@ public class NullableText extends Composite {
         setLayoutData(gd);
 
         initComponents();
+    
+        this.locale=locale;
+        if(locale != null){
+        	new SuggestionBubble(text.getShell(), text, locale.getLanguage());
+        }
+    }
+    
+    public Text getTextBox(){
+    	return this.text;
     }
 
     public void setOrientation(int orientation) {
@@ -91,7 +103,12 @@ public class NullableText extends Composite {
             renderNull();
         } else {
             this.text.setText(text);
+            
             renderNormal();
+        }
+        
+        if(locale == null){
+        	SuggestionBubble.defaultText = text;
         }
         Stack<String> undoCache = (Stack<String>) this.text.getData("UNDO");
         undoCache.push(this.text.getText());
