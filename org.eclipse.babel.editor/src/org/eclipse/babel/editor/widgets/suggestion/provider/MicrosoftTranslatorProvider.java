@@ -9,13 +9,13 @@ import com.memetix.mst.translate.Translate;
 
 public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 
-	private String customerID = "65c20c30-6149-4601-b453-9ebe21ae58ac";
-	private String accountKey = "rcWKv9hos62Y86uc/Hqk6l5C9HCBwg4GUXXa6weNRlE";
+	private static final String CUSTOMER_ID = "65c20c30-6149-4601-b453-9ebe21ae58ac";
+	private static final String ACCOUNT_KEY = "rcWKv9hos62Y86uc/Hqk6l5C9HCBwg4GUXXa6weNRlE";
 	private Image icon;
 
 	public MicrosoftTranslatorProvider(){
-		Translate.setClientId(customerID);
-		Translate.setClientSecret(accountKey);
+		Translate.setClientId(CUSTOMER_ID);
+		Translate.setClientSecret(ACCOUNT_KEY);
 		icon = new Image(Display.getCurrent(),"icons/mt16.png");
 	}
 

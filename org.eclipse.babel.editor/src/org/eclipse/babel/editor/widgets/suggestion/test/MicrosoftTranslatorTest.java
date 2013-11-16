@@ -41,7 +41,15 @@ public class MicrosoftTranslatorTest {
 	 * */
 	@Test
 	public void testGetSuggestion() {
-		Suggestion actual = mtp.getSuggestion(originalText, targetLanguage);
+		
+		Suggestion actual = null;
+		
+		try {
+			actual = mtp.getSuggestion(originalText, targetLanguage);
+		} catch (Exception e) {
+			fail();
+		}
+				
 		
 		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),"icons/mt16.png"),translatedText);
 		
@@ -51,7 +59,13 @@ public class MicrosoftTranslatorTest {
 	
 	@Test
 	public void testGetSuggestionWithTargetLanguageInUpperCase() {
-		Suggestion actual = mtp.getSuggestion(originalText, "DE");
+		Suggestion actual = null;
+		
+		try {
+			actual =  mtp.getSuggestion(originalText, "DE");
+		} catch (Exception e) {
+			fail();
+		}
 		
 		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),"icons/mt16.png"),translatedText);
 		
