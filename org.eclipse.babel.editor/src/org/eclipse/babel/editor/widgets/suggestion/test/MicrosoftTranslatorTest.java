@@ -12,15 +12,15 @@ import org.junit.Test;
 
 public class MicrosoftTranslatorTest {
 	
-	MicrosoftTranslatorProvider mtp;
+	private MicrosoftTranslatorProvider mtp;
 	
-	String originalText = "Instances of this class are selectable user " +
+	private String originalText = "Instances of this class are selectable user " +
 			"interface objects that allow the user to enter and modify text." +
 			" Text controls can be either single or multi-line."; 
 			
-	String targetLanguage = "de";
+	private String targetLanguage = "de";
 	
-	String translatedText = "Instanzen dieser Klasse sind wählbar " +
+	private String translatedText = "Instanzen dieser Klasse sind wählbar " +
 			"Benutzer-Interface-Objekte, mit denen den Benutzer eingeben " +
 			"und Ändern von Text. Text-Steuerelemente können entweder " +
 			"ein- oder mehrzeiligen sein.";
