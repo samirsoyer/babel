@@ -13,21 +13,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class MyMemoryProviderTest {
-	
+
 	private MyMemoryProvider mp;
 	private String originalText = "Instances of this class are" +
 			" selectable user interface objects";
-	
-	private String translatedText = "Instanzen dieser Klasse werden " +
-			"Objekte der Benutzeroberfl\u00e4che w\u00e4hlbar";
-	
+
+	private String translatedText = "Instanzen dieser Klasse sind" +
+			" w\u00e4hlbar Objekte der Benutzeroberfl\u00e4che";
+
 	private String targetLanguage = "de";
-	
+
 	@Before
 	public void setUp() throws Exception {
 		mp = new MyMemoryProvider();
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
 		mp = null;
@@ -36,49 +36,58 @@ public class MyMemoryProviderTest {
 	@Test
 	public void testgetSuggestion() {
 		Suggestion actual = null;
-		
+
 		try {
 			actual = mp.getSuggestion(originalText, targetLanguage);
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
-		
-		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),"icons/mymemo16.png"),translatedText);
-		
+
+		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),
+				"icons/mymemo16.png"),translatedText);
+
 		assertNotNull(actual);
 		assertEquals(expected.getText(), actual.getText());	
 	}
-	
+
 	@Test
 	public void testGetSuggestionWithTargetLanguageInUpperCase() {
 		Suggestion actual = null;
-		
+
 		try {
 			actual =  mp.getSuggestion(originalText, "DE");
 		} catch (Exception e) {
 			fail();
 		}
+
+		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),
+				"icons/mymemo16.png"),translatedText);
+
+		assertNotNull(actual);
+		assertEquals(expected.getText(), actual.getText());		
+	}
+
+	@Test
+	public void testGetSuggestionWithWrongLanguage() {
+		Suggestion actual = mp.getSuggestion(originalText, "foo");
 		
-		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),"icons/mymemo16.png"),translatedText);
+		Suggestion expected = new Suggestion(new Image(Display.getCurrent(),
+				"icons/mymemo16.png"),"No suggestions available");
 		
 		assertNotNull(actual);
 		assertEquals(expected.getText(), actual.getText());		
 	}
-	
-	@Test (expected = IllegalArgumentException.class)
-	public void testGetSuggestionWithWrongLanguage() {
-		mp.getSuggestion(originalText, "foo");
-	}
-	
+
 	@Test (expected = IllegalArgumentException.class)
 	public void testGetSuggestionWithNullParameter() {
 		mp.getSuggestion(null, null);
 	}
-	
+
 	@Test (expected = IllegalArgumentException.class)
 	public void testGetSuggestionShouldThrowIllegalArgumentException() {
 		mp.getSuggestion("", "");
-		
+
 	}
 
 }

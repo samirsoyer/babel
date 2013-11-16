@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/Samir/Documents/SAMIR/WIEN/TU WIEN/INSO Bakkarbeit/TapiJI/workspace/plugins/org.eclipse.babel.editor/microsoft-translator-java-api-0.6.2-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Samir/Documents/SAMIR/WIEN/TU WIEN/INSO Bakkarbeit/TapiJI/workspace/plugins/org.eclipse.babel.editor/gson-2.2.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

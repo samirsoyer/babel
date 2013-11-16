@@ -21,10 +21,11 @@ public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 
 
 	/**
-	 * @param original is the original text that should be translated.
-	 * @param targetLanguage should be a two letter abbreviation e.g "de" for GERMAN.
+	 * Connects to Microsoft Translator, translates given String form
+	 * English to {@code targetLanguage}, then returns translation as Suggestion object
 	 * 
 	 * Supported languages and their abbreviations are:
+	 * <p><blockquote><pre>
 	 * ARABIC("ar"),
 	 * BULGARIAN("bg"),
 	 * CATALAN("ca"),
@@ -66,6 +67,11 @@ public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 	 * UKRAINIAN("uk"),
 	 * URDU("ur"),
 	 * VIETNAMESE("vi");
+	 *  </pre></blockquote><p>
+	 * 
+	 * @param original is the original text that  is going be translated.
+	 * @param targetLanguage should be in ISO 639-1 Code, e.g "de" for GERMAN.
+	 * @return suggestion object
 	 * 
 	 * */
 	@Override
