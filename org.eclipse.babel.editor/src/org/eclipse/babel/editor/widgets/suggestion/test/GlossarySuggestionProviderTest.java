@@ -15,8 +15,8 @@ import org.junit.Test;
 public class GlossarySuggestionProviderTest {
 
 	private GlossarySuggestionProvider gsp;
-	private String originalText = "Instance of this class are selectable";
-	private String translatedText = "Instanz dieser Klasse (59% match)";
+	private String originalText = "Instances of this class are selectable";
+	private String translatedText = "Instanzen dieser Klasse (60% match)";
 	private String targetLanguage = "de";
 
 	/**Test glossary */

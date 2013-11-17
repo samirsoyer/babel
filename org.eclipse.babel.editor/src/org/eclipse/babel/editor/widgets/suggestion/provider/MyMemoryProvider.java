@@ -7,10 +7,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.babel.editor.util.UIUtils;
 import org.eclipse.babel.editor.widgets.suggestion.ISuggestionProvider;
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -23,8 +23,8 @@ public class MyMemoryProvider implements ISuggestionProvider {
 
 
 	public MyMemoryProvider() {
-//		this.icon = new Image(Display.getCurrent(),"icons/mymemo16.png");
-		this.icon = UIUtils.getImageDescriptor("mymemo16.png").createImage();
+		this.icon = new Image(Display.getCurrent(),System.getProperty("user.dir")+"/icons/mymemo16.png");
+//		this.icon = UIUtils.getImageDescriptor("mymemo16.png").createImage();
 	}
 
 

@@ -83,7 +83,7 @@ public class SuggestionBubble {
 		
 //		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
 		
-		
+		//TODO optimize performance (get translation only if default text is modified, etc)
 		
 		createListeners();
 	}
@@ -456,8 +456,16 @@ public class SuggestionBubble {
 		IStructuredSelection selection = (IStructuredSelection) tableViewer
 				.getSelection();
 		Suggestion suggestion = (Suggestion) selection.getFirstElement();
+		
+		String s = suggestion.getText();
 
-		text.setText(suggestion.getText());
+		if(suggestion.getText().contains("% match")){
+			s = suggestion.getText().replaceAll("[(].*[% match)]", "");
+		}
+		
+		//TODO filter No Suggestion
+		
+		text.setText(s);
 		dialog.close();
 	}
 

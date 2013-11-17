@@ -1,23 +1,24 @@
 package org.eclipse.babel.editor.widgets.suggestion.provider;
 
-import org.eclipse.babel.editor.util.UIUtils;
 import org.eclipse.babel.editor.widgets.suggestion.ISuggestionProvider;
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+
 import com.memetix.mst.language.Language;
 import com.memetix.mst.translate.Translate;
 
 public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 
-	private static final String CUSTOMER_ID = "65c20c30-6149-4601-b453-9ebe21ae58ac";
-	private static final String ACCOUNT_KEY = "rcWKv9hos62Y86uc/Hqk6l5C9HCBwg4GUXXa6weNRlE";
+	private static final String CLIENT_ID = "tapiji_translator";
+	private static final String CLIENT_SECRET = "+aQX87s1KwVOziGL3DgAdXIQu63K0nYDS7bNkh3XuyE=";
 	private Image icon;
 
 	public MicrosoftTranslatorProvider(){
-		Translate.setClientId(CUSTOMER_ID);
-		Translate.setClientSecret(ACCOUNT_KEY);
-		icon = UIUtils.getImageDescriptor("mt16.png").createImage();
-//		icon = new Image(Display.getCurrent(),"icons/mt16.png");
+		Translate.setClientId(CLIENT_ID);
+		Translate.setClientSecret(CLIENT_SECRET);
+//		icon = UIUtils.getImageDescriptor("mt16.png").createImage();
+		icon = new Image(Display.getCurrent(),System.getProperty("user.dir")+"/icons/mt16.png");
 	}
 
 
@@ -76,7 +77,7 @@ public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 	 * 
 	 * */
 	@Override
-	public Suggestion getSuggestion(String original, String targetLanguage) {
+	public Suggestion getSuggestion(String original, String targetLanguage) throws IllegalArgumentException{
 		
 		if(original == null || targetLanguage == null ||
 				original.equals("") || targetLanguage.equals("")){

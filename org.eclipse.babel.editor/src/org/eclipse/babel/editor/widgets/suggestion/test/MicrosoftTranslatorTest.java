@@ -47,6 +47,7 @@ public class MicrosoftTranslatorTest {
 		try {
 			actual = mtp.getSuggestion(originalText, targetLanguage);
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 				

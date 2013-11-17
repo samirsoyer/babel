@@ -5,10 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.eclipse.babel.editor.util.UIUtils;
 import org.eclipse.babel.editor.widgets.suggestion.ISuggestionProvider;
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -24,8 +24,8 @@ public class GlossarySuggestionProvider extends DefaultHandler implements ISugge
 	public GlossarySuggestionProvider(File glossaryFile) {
 		super();
 		this.glossaryFile = glossaryFile;
-//		this.icon = new Image(Display.getCurrent(),"icons/sample.gif");
-		this.icon = UIUtils.getImageDescriptor("sample.gif").createImage();
+		this.icon = new Image(Display.getCurrent(),System.getProperty("user.dir")+"/icons/sample.gif");
+//		this.icon = UIUtils.getImageDescriptor("sample.gif").createImage();
 	}
 
 	@Override
