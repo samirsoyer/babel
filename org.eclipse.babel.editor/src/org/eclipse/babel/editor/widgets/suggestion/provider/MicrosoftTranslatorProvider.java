@@ -73,6 +73,7 @@ public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 	 * 
 	 * @param original is the original text that  is going be translated.
 	 * @param targetLanguage should be in ISO 639-1 Code, e.g "de" for GERMAN.
+	 * If not specified "zh-CHS" will be used for any variants of Chinese
 	 * @return suggestion object
 	 * 
 	 * */
@@ -84,18 +85,34 @@ public class MicrosoftTranslatorProvider implements ISuggestionProvider {
 			throw new IllegalArgumentException();
 		}
 		
+		targetLanguage=targetLanguage.toLowerCase();
+		
 		String translatedText = "";
+		
+		if(targetLanguage.contains("zh")){
+			targetLanguage = "zh-CHS";
+		}
+		
+		try {
+			if(!Language.getLanguageCodesForTranslation().contains(targetLanguage)){
+				return new Suggestion(icon,"Language not supported");
+			}
+		} catch (Exception e1) {
+			return new Suggestion(icon,"Language not supported");
+		}
 
 		try {
-			translatedText = Translate.execute(original, Language.AUTO_DETECT, Language.fromString(targetLanguage.toLowerCase()));
+			translatedText = Translate.execute(original, Language.AUTO_DETECT, Language.fromString(targetLanguage));
 		} catch (Exception e) {
 			//TODO logging 
-			throw new IllegalArgumentException();
+			return new Suggestion(icon,"No suggestions available");
 		}
 		
 		if(translatedText.toLowerCase().contains("exception")){
 			return new Suggestion(icon,"No suggestions available");
 		}
+		
+		System.out.println("translatedText "+translatedText);
 
 		return new Suggestion(icon,translatedText);
 	}
