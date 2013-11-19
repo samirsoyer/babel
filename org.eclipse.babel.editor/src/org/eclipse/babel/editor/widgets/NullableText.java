@@ -40,7 +40,6 @@ public class NullableText extends Composite {
     private final Text text;
     private final Color defaultColor;
     private final Color nullColor;
-    private Locale locale;
 
     private boolean isnull;
 
@@ -82,9 +81,9 @@ public class NullableText extends Composite {
 
         initComponents();
     
-        this.locale=locale;
         if(locale != null){
-        	new SuggestionBubble(text.getShell(), text, locale.getLanguage());
+        	new SuggestionBubble(text,locale.getLanguage());
+        	
         }
     }
     
@@ -107,9 +106,6 @@ public class NullableText extends Composite {
             renderNormal();
         }
         
-        if(locale == null){
-        	SuggestionBubble.defaultText = text;
-        }
         Stack<String> undoCache = (Stack<String>) this.text.getData("UNDO");
         undoCache.push(this.text.getText());
     }

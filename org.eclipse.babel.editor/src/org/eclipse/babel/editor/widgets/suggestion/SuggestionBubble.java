@@ -3,12 +3,9 @@ package org.eclipse.babel.editor.widgets.suggestion;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.eclipse.babel.editor.plugin.MessagesEditorPlugin;
 import org.eclipse.babel.editor.widgets.suggestion.filter.SuggestionFilter;
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
-import org.eclipse.babel.editor.widgets.suggestion.provider.GlossarySuggestionProvider;
-import org.eclipse.babel.editor.widgets.suggestion.provider.MicrosoftTranslatorProvider;
-import org.eclipse.babel.editor.widgets.suggestion.provider.MyMemoryProvider;
+import org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProvider;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -52,50 +49,58 @@ public class SuggestionBubble {
 	private Composite composite;
 	private Label noSug;
 	private PartialTranslationDialog partialTranslationDialog;
-	private ArrayList<ISuggestionProvider> suggestionProviders;
+	private static ArrayList<ISuggestionProvider> suggestionProviders;
 	private ArrayList<Suggestion> suggestions;
 	// private String sourceLanguage;
 	private String targetLanguage;
-	public static String defaultText;
+	private static String defaultText;
 
-	public SuggestionBubble(Shell shell, Text text, String targetLanguage) {
-		this.shell = shell;
-		this.text = text;
+	public SuggestionBubble(Text parent, String targetLanguage) {
+		shell = parent.getShell();
+		text = parent;
 		this.targetLanguage=targetLanguage;
 
-		suggestionProviders = new ArrayList<ISuggestionProvider>();
+//		suggestionProviders = new ArrayList<ISuggestionProvider>();
 		suggestionFilter = new SuggestionFilter();
 		suggestions = new ArrayList<Suggestion>();
 
-		suggestionProviders.add(new MicrosoftTranslatorProvider());
-		suggestionProviders.add(new MyMemoryProvider());
-		suggestionProviders.add(new GlossarySuggestionProvider(
-				new File(System.getProperty("user.dir")+"/glossary.xml")));
+//		SuggestionProviderRegistry.registerProviders();
+		//		suggestionProviders.add(new MicrosoftTranslatorProvider());
+//		suggestionProviders.add(new MyMemoryProvider());
+//		suggestionProviders.add(new GlossarySuggestionProvider(
+//				new File(System.getProperty("user.dir")+"/glossary.xml")));
+
+		//		System.out.println(System.getProperty("user.dir"));
+
+		//		MessagesEditorPlugin.getDefault().getBundle().
+		//		getEntry("glossary.xml").getPath()
 		
-//		System.out.println(System.getProperty("user.dir"));
-		
-//		MessagesEditorPlugin.getDefault().getBundle().
-//		getEntry("glossary.xml").getPath()
-		
-//		C:\Users\Samir\Documents\SAMIR\WIEN\TU WIEN\INSO Bakkarbeit\TapiJI\workspace\plugins\org.eclipse.babel.editor
-		
-//		;
-		
-//		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
-		
+		//		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
+
 		//TODO optimize performance (get translation only if default text is modified, etc)
-		
-		createListeners();
+
+		init();
 	}
 
-	public void addSuggestionProvider(ISuggestionProvider suggestionProvider) {
+	public static void addSuggestionProvider(ISuggestionProvider suggestionProvider) {
+		if(suggestionProviders == null){
+			suggestionProviders = new ArrayList<ISuggestionProvider>();
+		}
 		suggestionProviders.add(suggestionProvider);
-		updateSuggestions();
 	}
 
-	public void removeSuggestionProvider(ISuggestionProvider suggestionProvider) {
-		suggestionProviders.remove(suggestionProvider);
-		updateSuggestions();
+	public static void removeSuggestionProvider(ISuggestionProvider suggestionProvider) {
+		if(suggestionProviders != null){
+			suggestionProviders.remove(suggestionProvider);
+		}
+	}
+
+	public static String getDefaultText() {
+		return defaultText;
+	}
+
+	public static void setDefaultText(String defaultText) {
+		SuggestionBubble.defaultText = defaultText;
 	}
 
 	private void updateSuggestions() {
@@ -104,7 +109,7 @@ public class SuggestionBubble {
 
 		for (ISuggestionProvider provider : suggestionProviders) {
 			suggestions
-					.add(provider.getSuggestion(defaultText, targetLanguage));
+			.add(provider.getSuggestion(defaultText, targetLanguage));
 		}
 	}
 
@@ -121,7 +126,7 @@ public class SuggestionBubble {
 			dialog.close();
 	}
 
-	private void createListeners() {
+	private void init() {
 		// ModifyListener
 		text.addModifyListener(new ModifyListener() {
 
@@ -358,19 +363,19 @@ public class SuggestionBubble {
 				});
 
 				tableViewer
-						.addSelectionChangedListener(new ISelectionChangedListener() {
+				.addSelectionChangedListener(new ISelectionChangedListener() {
 
-							@Override
-							public void selectionChanged(
-									SelectionChangedEvent event) {
-								if (tableViewer.getTable().getSelection().length > 0) {
-									partialTranslationDialog.setVisible(true,
-											tableViewer.getTable()
-													.getSelection()[0]
-													.getText());
-								}
-							}
-						});
+					@Override
+					public void selectionChanged(
+							SelectionChangedEvent event) {
+						if (tableViewer.getTable().getSelection().length > 0) {
+							partialTranslationDialog.setVisible(true,
+									tableViewer.getTable()
+									.getSelection()[0]
+											.getText());
+						}
+					}
+				});
 
 				// For Windows 7
 				// Set background color of column line
@@ -456,15 +461,15 @@ public class SuggestionBubble {
 		IStructuredSelection selection = (IStructuredSelection) tableViewer
 				.getSelection();
 		Suggestion suggestion = (Suggestion) selection.getFirstElement();
-		
+
 		String s = suggestion.getText();
 
 		if(suggestion.getText().contains("% match")){
 			s = suggestion.getText().replaceAll("[(].*[% match)]", "");
 		}
-		
+
 		//TODO filter No Suggestion
-		
+
 		text.setText(s);
 		dialog.close();
 	}

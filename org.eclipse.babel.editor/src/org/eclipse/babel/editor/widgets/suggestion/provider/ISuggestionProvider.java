@@ -1,4 +1,4 @@
-package org.eclipse.babel.editor.widgets.suggestion;
+package org.eclipse.babel.editor.widgets.suggestion.provider;
 
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
 
