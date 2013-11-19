@@ -1,6 +1,5 @@
 package org.eclipse.babel.editor.widgets.suggestion;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import org.eclipse.babel.editor.widgets.suggestion.filter.SuggestionFilter;
@@ -49,35 +48,25 @@ public class SuggestionBubble {
 	private Composite composite;
 	private Label noSug;
 	private PartialTranslationDialog partialTranslationDialog;
-	private static ArrayList<ISuggestionProvider> suggestionProviders;
 	private ArrayList<Suggestion> suggestions;
-	// private String sourceLanguage;
+	private static ArrayList<ISuggestionProvider> suggestionProviders;
 	private String targetLanguage;
 	private static String defaultText;
+	private String oldDefaultText = "";
 
 	public SuggestionBubble(Text parent, String targetLanguage) {
 		shell = parent.getShell();
 		text = parent;
 		this.targetLanguage=targetLanguage;
 
-//		suggestionProviders = new ArrayList<ISuggestionProvider>();
+		//		suggestionProviders = new ArrayList<ISuggestionProvider>();
 		suggestionFilter = new SuggestionFilter();
 		suggestions = new ArrayList<Suggestion>();
 
-//		SuggestionProviderRegistry.registerProviders();
-		//		suggestionProviders.add(new MicrosoftTranslatorProvider());
-//		suggestionProviders.add(new MyMemoryProvider());
-//		suggestionProviders.add(new GlossarySuggestionProvider(
-//				new File(System.getProperty("user.dir")+"/glossary.xml")));
-
-		//		System.out.println(System.getProperty("user.dir"));
-
 		//		MessagesEditorPlugin.getDefault().getBundle().
 		//		getEntry("glossary.xml").getPath()
-		
-		//		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
 
-		//TODO optimize performance (get translation only if default text is modified, etc)
+		//		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
 
 		init();
 	}
@@ -92,7 +81,7 @@ public class SuggestionBubble {
 	public static void removeSuggestionProvider(ISuggestionProvider suggestionProvider) {
 		if(suggestionProviders != null){
 			suggestionProviders.remove(suggestionProvider);
-		}
+		}	
 	}
 
 	public static String getDefaultText() {
@@ -100,16 +89,20 @@ public class SuggestionBubble {
 	}
 
 	public static void setDefaultText(String defaultText) {
-		SuggestionBubble.defaultText = defaultText;
+		SuggestionBubble.defaultText = defaultText;		
 	}
 
 	private void updateSuggestions() {
+		System.out.println("oldDefaultText "+oldDefaultText+" defaultText "+defaultText);
+		if(!oldDefaultText.equals(defaultText)){
+			
+			suggestions.clear();
 
-		suggestions.clear();
-
-		for (ISuggestionProvider provider : suggestionProviders) {
-			suggestions
-			.add(provider.getSuggestion(defaultText, targetLanguage));
+			for (ISuggestionProvider provider : suggestionProviders) {
+				suggestions
+				.add(provider.getSuggestion(defaultText, targetLanguage));
+			}
+			oldDefaultText = defaultText;
 		}
 	}
 
@@ -127,6 +120,7 @@ public class SuggestionBubble {
 	}
 
 	private void init() {
+
 		// ModifyListener
 		text.addModifyListener(new ModifyListener() {
 
@@ -469,6 +463,10 @@ public class SuggestionBubble {
 		}
 
 		//TODO filter No Suggestion
+		//		if(s.contains("No suggestion available") ||
+		//				s.contains("Language not supported")){
+		//			
+		//		}
 
 		text.setText(s);
 		dialog.close();

@@ -20,6 +20,8 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -40,6 +42,7 @@ public class NullableText extends Composite {
     private final Text text;
     private final Color defaultColor;
     private final Color nullColor;
+    private Locale locale;
 
     private boolean isnull;
 
@@ -80,10 +83,17 @@ public class NullableText extends Composite {
         setLayoutData(gd);
 
         initComponents();
-    
+        this.locale=locale;
+        
         if(locale != null){
-        	new SuggestionBubble(text,locale.getLanguage());
-        	
+        	new SuggestionBubble(text,locale.getLanguage()); 	
+        }else{
+        	text.addModifyListener(new ModifyListener(){
+				@Override
+				public void modifyText(ModifyEvent e) {
+					SuggestionBubble.setDefaultText(text.getText());
+				}
+        	});
         }
     }
     
@@ -97,6 +107,11 @@ public class NullableText extends Composite {
 
     public void setText(String text) {
         isnull = text == null;
+        
+        if(locale == null){
+        	SuggestionBubble.setDefaultText(text);
+        }
+        
         if (isnull) {
             this.text.setText(""); //$NON-NLS-1$x
             renderNull();

@@ -18,7 +18,6 @@ import org.eclipse.babel.core.message.IMessage;
 import org.eclipse.babel.core.message.IMessagesBundleGroup;
 import org.eclipse.babel.core.util.BabelUtils;
 import org.eclipse.babel.editor.internal.AbstractMessagesEditor;
-import org.eclipse.babel.editor.widgets.suggestion.SuggestionBubble;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -44,10 +43,6 @@ public class I18NEntry extends AbstractI18NEntry {
             } else {
                 // commentedCheckbox.setSelection(bundleEntry.isCommented());
                 textBox.setText(entry.getValue());
-                
-                if(locale == null && SuggestionBubble.getDefaultText() == null){
-                	SuggestionBubble.setDefaultText(entry.getValue());
-                }
             }
         } else {
             textBox.setText(null);
