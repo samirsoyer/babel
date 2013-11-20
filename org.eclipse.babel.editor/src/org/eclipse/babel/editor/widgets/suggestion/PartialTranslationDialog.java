@@ -29,10 +29,14 @@ public class PartialTranslationDialog {
 	private SuggestionBubble parent;
 	private Composite composite;
 	private Text textField;
+	private final String FOOT_NOTE_1 = "Click for focus";
+	private final String FOOT_NOTE_2 = "Mark the text, which will be used as translation, then click on 'Apply' button";
+	private String infoText;
 
 	public PartialTranslationDialog(Shell shell, SuggestionBubble parent){
 		this.parent=parent;
 		this.shell=shell;
+		infoText = FOOT_NOTE_1;
 	}
 
 	private void createDialog(final String text, final int shellStyle){
@@ -43,8 +47,7 @@ public class PartialTranslationDialog {
 		boolean persistLocation = false;
 		boolean showDialogMenu = false;
 		boolean showPersistActions = false;		
-		String titleText = null;
-		String infoText = "Mark the text, which will be used as translation, then click on 'Apply' button";
+		String titleText = null;		
 		dialog = new PopupDialog(shell, shellStyle, takeFocusOnOpen, 
 				persistSize, persistLocation, showDialogMenu, showPersistActions, titleText, infoText){
 
@@ -117,6 +120,10 @@ public class PartialTranslationDialog {
 				int y = start.y;
 				int screenWidth = Display.getCurrent().getBounds().width;
 				
+				if(screenWidth - x <= 200){
+					x = start.x - 450;
+				}
+				
 				getShell().setLocation(x,y);
 				
 				if(screenWidth - x < 450){
@@ -138,6 +145,7 @@ public class PartialTranslationDialog {
 							return;
 						}
 						dialog.close();
+						infoText = FOOT_NOTE_2;
 						createDialog(text,PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE);
 						dialog.open();
 

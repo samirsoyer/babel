@@ -44,7 +44,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -438,6 +440,15 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		dialog.open();
 		partialTranslationDialog = new PartialTranslationDialog(
 				dialog.getShell(), this);
+		
+		dialog.getShell().addListener(SWT.Resize,  new Listener () {
+		    public void handleEvent(Event e) {
+//		      Rectangle rect = dialog.getShell().getClientArea ();
+//		      System.out.println("resized "+rect);
+		    	partialTranslationDialog.setVisible(false, "");
+		    	//TODO add timer to activate dialog again after 1 second
+		    }
+		  });
 	}
 
 	public Text getTextField() {
