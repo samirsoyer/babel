@@ -1,10 +1,23 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Samir Soyer.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Samir Soyer - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.babel.editor.widgets.suggestion;
 
 import java.util.ArrayList;
 
+import org.eclipse.babel.editor.widgets.suggestion.exception.SuggestionErrors;
 import org.eclipse.babel.editor.widgets.suggestion.filter.SuggestionFilter;
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
 import org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProvider;
+import org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProviderListener;
+import org.eclipse.babel.editor.widgets.suggestion.provider.SuggestionProviderUtils;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -35,7 +48,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class SuggestionBubble {
+/**
+ * Auto complete pop-up dialog that displays translation suggestions from
+ * a given text to a target language. Detecting the source language depends on
+ * the implementation of {@link ISuggestionProvider}.
+ * 
+ * @author Samir Soyer
+ */
+public class SuggestionBubble implements ISuggestionProviderListener{
 
 	// TODO documentation
 
@@ -49,11 +69,20 @@ public class SuggestionBubble {
 	private Label noSug;
 	private PartialTranslationDialog partialTranslationDialog;
 	private ArrayList<Suggestion> suggestions;
-	private static ArrayList<ISuggestionProvider> suggestionProviders;
+	//	private static ArrayList<ISuggestionProvider> suggestionProviders;
 	private String targetLanguage;
 	private static String defaultText;
 	private String oldDefaultText = "";
 
+
+	/**
+	 * Constructor
+	 * 
+	 * @param parent is the parent {@link Text} object, to which SuggestionBubble
+	 * will be added.
+	 * @param targetLanguage is the language, to which the {@link SuggestionBubble.defaultText}
+	 * will be translated
+	 */
 	public SuggestionBubble(Text parent, String targetLanguage) {
 		shell = parent.getShell();
 		text = parent;
@@ -68,21 +97,23 @@ public class SuggestionBubble {
 
 		//		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
 
+		SuggestionProviderUtils.addSuggestionProviderUpdateListener(this);
+
 		init();
 	}
 
-	public static void addSuggestionProvider(ISuggestionProvider suggestionProvider) {
-		if(suggestionProviders == null){
-			suggestionProviders = new ArrayList<ISuggestionProvider>();
-		}
-		suggestionProviders.add(suggestionProvider);
-	}
-
-	public static void removeSuggestionProvider(ISuggestionProvider suggestionProvider) {
-		if(suggestionProviders != null){
-			suggestionProviders.remove(suggestionProvider);
-		}	
-	}
+	//	public static void addSuggestionProvider(ISuggestionProvider suggestionProvider) {
+	//		if(suggestionProviders == null){
+	//			suggestionProviders = new ArrayList<ISuggestionProvider>();
+	//		}
+	//		suggestionProviders.add(suggestionProvider);
+	//	}
+	//
+	//	public static void removeSuggestionProvider(ISuggestionProvider suggestionProvider) {
+	//		if(suggestionProviders != null){
+	//			suggestionProviders.remove(suggestionProvider);
+	//		}	
+	//	}
 
 	public static String getDefaultText() {
 		return defaultText;
@@ -92,13 +123,16 @@ public class SuggestionBubble {
 		SuggestionBubble.defaultText = defaultText;		
 	}
 
-	private void updateSuggestions() {
-		System.out.println("oldDefaultText "+oldDefaultText+" defaultText "+defaultText);
+	private void updateSuggestions() {		
 		if(!oldDefaultText.equals(defaultText)){
-			
+
+			ArrayList<ISuggestionProvider> providers =
+					SuggestionProviderUtils.getSuggetionProviders();
+
+
 			suggestions.clear();
 
-			for (ISuggestionProvider provider : suggestionProviders) {
+			for (ISuggestionProvider provider : providers) {
 				suggestions
 				.add(provider.getSuggestion(defaultText, targetLanguage));
 			}
@@ -462,11 +496,14 @@ public class SuggestionBubble {
 			s = suggestion.getText().replaceAll("[(].*[% match)]", "");
 		}
 
-		//TODO filter No Suggestion
-		//		if(s.contains("No suggestion available") ||
-		//				s.contains("Language not supported")){
-		//			
-		//		}
+		if(s.equals(SuggestionErrors.LANG_NOT_SUPPORT_ERR) ||
+				s.equals(SuggestionErrors.CONNECTION_ERR)    ||
+				s.equals(SuggestionErrors.NO_SUGESTION_ERR)|| 
+				s.equals(SuggestionErrors.QUOTA_EXCEEDED) ||
+				s.equals(SuggestionErrors.NO_GLOSSARY_FILE)){
+			//Ignore call
+			return;
+		}
 
 		text.setText(s);
 		dialog.close();
@@ -492,6 +529,22 @@ public class SuggestionBubble {
 			return false;
 		}
 		return true;
+
+	}
+
+	@Override
+	public void SuggestionProviderUpdated(ISuggestionProvider provider, int index) {
+
+		if(suggestions.size() > index){
+			suggestions
+			.set(index,provider.getSuggestion(defaultText, targetLanguage));
+		}else{
+			suggestions.add(provider.getSuggestion(defaultText, targetLanguage));
+		}
+
+		if(tableViewer != null && !tableViewer.getTable().isDisposed()){			
+			tableViewer.setInput(suggestions);
+		}
 
 	}
 }
