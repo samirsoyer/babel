@@ -8,6 +8,7 @@
  * Contributors:
  *    Pascal Essiembre - initial API and implementation
  *    Alexej Strelzow - updateKey
+ *    Samir Soyer     - passing Locale to NullableText
  ******************************************************************************/
 package org.eclipse.babel.editor.i18n;
 

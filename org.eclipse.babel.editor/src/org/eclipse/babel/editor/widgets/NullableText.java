@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    Pascal Essiembre - initial API and implementation
+ *    Samir Soyer      - Suggestion Bubble
  ******************************************************************************/
 package org.eclipse.babel.editor.widgets;
 

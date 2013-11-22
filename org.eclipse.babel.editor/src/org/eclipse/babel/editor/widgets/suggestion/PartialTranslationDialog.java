@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Samir Soyer.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Samir Soyer - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.babel.editor.widgets.suggestion;
 
 
@@ -22,6 +32,12 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Child dialog of {@link SuggestionBubble}, which lets user to mark a part
+ * of the suggestion and apply it to {@link Text}
+ * @author Samir Soyer
+ *
+ */
 public class PartialTranslationDialog {
 
 	private PopupDialog  dialog;
@@ -33,10 +49,14 @@ public class PartialTranslationDialog {
 	private final String FOOT_NOTE_2 = "Mark the text, which will be used as translation, then click on 'Apply' button";
 	private String infoText;
 
+	/**
+	 * The constructor
+	 * @param shell is the shell of the SuggestionBubble that is parent of this dialog
+	 * @param parent is the parent of this dialog.
+	 */
 	public PartialTranslationDialog(Shell shell, SuggestionBubble parent){
 		this.parent=parent;
 		this.shell=shell;
-		infoText = FOOT_NOTE_1;
 	}
 
 	private void createDialog(final String text, final int shellStyle){
@@ -161,19 +181,33 @@ public class PartialTranslationDialog {
 		};
 	}
 
+	/**
+	 * @return location of this dialog relative to display
+	 */
 	public Point getLocation(){
 		return dialog.getShell().toDisplay(1, 1);
 	}
 
+	/**
+	 * @return size if this dialog
+	 */
 	public Point getSize(){
 		return dialog.getShell().getSize();
 	}
 
+	/**
+	 * Creates or disposes the dialog.
+	 * @param visible if it is true and dialog is not already created,
+	 * it will be created and made visible. If it is false, 
+	 * dialog will be disposed. 
+	 * @param text is the string to displayed in the dialog
+	 */
 	public void setVisible(boolean visible, String text){
 		if(visible){
 			if(dialog != null && dialog.getShell() != null){
 				textField.setText(text);		
 			}else{
+				infoText = FOOT_NOTE_1;
 				createDialog(text, PopupDialog.INFOPOPUP_SHELLSTYLE);
 				dialog.open();
 			}
@@ -186,6 +220,10 @@ public class PartialTranslationDialog {
 
 	}
 
+	/**
+	 * @return true if mouse cursor is in the bounds of dialog,
+	 * otherwise false.
+	 */
 	public boolean isCursorInsideDialog(){
 
 		if(dialog == null || dialog.getShell() == null || 
@@ -209,6 +247,10 @@ public class PartialTranslationDialog {
 		return true;
 	}
 
+	/**
+	 * @return true if dialog is already created and visible,
+	 * otherwise false.
+	 */
 	public boolean isVisible(){
 		if(dialog != null && dialog.getShell() != null){
 			return true;
