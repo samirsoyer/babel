@@ -11,6 +11,7 @@
 package org.eclipse.babel.editor.widgets.suggestion;
 
 
+import org.eclipse.babel.editor.widgets.suggestion.exception.SuggestionErrors;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -117,7 +118,8 @@ public class PartialTranslationDialog {
 
 			            String selection = text.getSelectionText();
 
-			            if(selection.length() > 0)
+			            if(selection.length() > 0 && 
+			            		!SuggestionErrors.contains(textField.getText()))
 			            {
 			                button.setEnabled(true);
 			            }else{
@@ -168,6 +170,7 @@ public class PartialTranslationDialog {
 						infoText = FOOT_NOTE_2;
 						createDialog(text,PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE);
 						dialog.open();
+						dialog.getShell().setFocus();
 
 					}
 
