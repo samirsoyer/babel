@@ -12,6 +12,8 @@ package org.eclipse.babel.editor.widgets.suggestion;
 
 import java.util.ArrayList;
 
+import org.eclipse.babel.editor.internal.AbstractMessagesEditor;
+import org.eclipse.babel.editor.widgets.NullableText;
 import org.eclipse.babel.editor.widgets.suggestion.exception.SuggestionErrors;
 import org.eclipse.babel.editor.widgets.suggestion.filter.SuggestionFilter;
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
@@ -52,6 +54,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.EditorPart;
+import org.eclipse.ui.part.WorkbenchPart;
 
 /**
  * Auto complete pop-up dialog that displays translation suggestions from
@@ -571,17 +577,23 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		Suggestion suggestion = (Suggestion) selection.getFirstElement();
 
 		String s = suggestion.getText();
-
-		if(suggestion.getText().contains("% match")){
-			s = suggestion.getText().replaceAll("[(].*[% match)]", "");
-		}
+		
+		//Filter out [(].*[% match)]
+		if(s.lastIndexOf("(") != -1){
+			s = s.substring(0,s.lastIndexOf("(")-1);
+		}		
 
 		if(SuggestionErrors.contains(s)){
 			//Ignore call
 			return;
 		}
-
-		text.setText(s);
+		
+		((NullableText) text.getParent()).setText(s);
+		AbstractMessagesEditor part = (AbstractMessagesEditor) PlatformUI.getWorkbench().
+				getActiveWorkbenchWindow().getActivePage().getActivePart();
+		if(part != null){
+			part.setDirty(true);
+		}
 		dialog.close();
 	}
 
