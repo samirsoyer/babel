@@ -10,7 +10,13 @@
  ******************************************************************************/
 package org.eclipse.babel.editor.widgets.suggestion;
 
+import java.awt.Frame;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import org.eclipse.babel.editor.internal.AbstractMessagesEditor;
 import org.eclipse.babel.editor.widgets.NullableText;
@@ -31,6 +37,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -75,6 +82,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	private Point caret;
 	private SuggestionFilter suggestionFilter;
 	private Composite composite;
+	private Composite loadingCircle;
 	private Label noSug;
 	private PartialTranslationDialog partialTranslationDialog;
 	private ArrayList<Suggestion> suggestions;
@@ -125,7 +133,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	//		}	
 	//	}
 
-	
+
 	/**
 	 * @return default text i.e source text that is being localized
 	 */
@@ -133,7 +141,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		return defaultText;
 	}
 
-	
+
 	/**
 	 * @param defaultText is the source text that is being localized.
 	 */
@@ -178,25 +186,25 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	}
 
 	private void init() {
-		
+
 		//shell resize listener to dispose suggestion bubble
 		shell.addListener(SWT.Resize,  new Listener () {
-		    public void handleEvent(Event e) {
-		    	if(dialog != null && dialog.getShell() != null){		    		
-		    		dialog.close();
-		    	}
-		    }
-		  });
-		
+			public void handleEvent(Event e) {
+				if(dialog != null && dialog.getShell() != null){		    		
+					dialog.close();
+				}
+			}
+		});
+
 		//shell move listener
 		shell.addListener(SWT.Move,  new Listener () {
-		    public void handleEvent(Event e) {
-		    	if(dialog != null && dialog.getShell() != null){
-		    		dialog.close();
-		    	}
-		    }
-		  });
-		
+			public void handleEvent(Event e) {
+				if(dialog != null && dialog.getShell() != null){
+					dialog.close();
+				}
+			}
+		});
+
 		// get ScrolledComposite
 		ScrolledComposite scrolledComposite = (ScrolledComposite)
 				text.getParent().getParent().getParent().getParent(); 
@@ -205,13 +213,13 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if(dialog != null && dialog.getShell() != null){
-		    		dialog.close();
-		    	}
+					dialog.close();
+				}
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
-			
+
 		});
 
 		// ModifyListener
@@ -222,7 +230,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 				recalculatePosition();
 
-				
+
 				if (dialog != null && dialog.getShell() != null
 						&& !tableViewer.getControl().isDisposed()) {
 					suggestionFilter.setSearchText(text.getText().trim());
@@ -244,7 +252,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 							composite.layout();
 						}
 					}
-					
+
 					suggestionFilter.setSearchText("");
 				}
 			}
@@ -397,6 +405,16 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 			protected Control createDialogArea(Composite parent) {
 				composite = (Composite) super.createDialogArea(parent);
 
+				//Create loading cicle
+				loadingCircle = new Composite(composite, SWT.EMBEDDED | SWT.NO_BACKGROUND);
+				Frame frame = SWT_AWT.new_Frame(loadingCircle);				
+				ImageIcon imageIcon = new ImageIcon(this.getClass().getResource("/icons/ajax-loader.gif"));
+				JLabel label = new JLabel(imageIcon);
+				frame.add(label);
+				frame.setBackground(new java.awt.Color(255, 255, 225));	
+
+				loadingCircle.setLayoutData(new GridData(GridData.CENTER,SWT.TOP,false,false));
+
 				tableViewer = new TableViewer(composite, SWT.V_SCROLL);
 				tableViewer.getTable().setLayoutData(
 						new GridData(GridData.FILL_BOTH));
@@ -435,10 +453,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 					public void removeListener(ILabelProviderListener arg0) {
 						// nothing to do
 					}
-				});
-
-				updateSuggestions();
-				tableViewer.setInput(suggestions.toArray());
+				});				
 
 				tableViewer.addFilter(suggestionFilter);
 
@@ -497,14 +512,36 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 		};
 		dialog.open();
+
 		partialTranslationDialog = new PartialTranslationDialog(
 				dialog.getShell(), this);
-		
+
 		dialog.getShell().addListener(SWT.Resize,  new Listener () {
-		    public void handleEvent(Event e) {
-		    	partialTranslationDialog.setVisible(false, "");
-		    }
-		  });
+			public void handleEvent(Event e) {
+				partialTranslationDialog.setVisible(false, "");
+			}
+		});
+
+		final Display d = Display.getCurrent();
+		Thread fetch = new Thread(){
+			@Override
+			public void run(){
+				updateSuggestions();
+				d.asyncExec(new Runnable(){
+					@Override
+					public void run(){
+
+						//remove laoding circle
+						if(!composite.isDisposed()){
+							loadingCircle.dispose();
+							tableViewer.setInput(suggestions.toArray());
+							composite.layout();
+						}
+					}
+				});
+			}
+		};
+		fetch.start();
 	}
 
 	/**
@@ -514,7 +551,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		return text;
 	}
 
-	
+
 	/**
 	 * @return language of this SuggestionBubble, to which default text
 	 * is being translated
@@ -523,7 +560,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		return targetLanguage;
 	}
 
-	
+
 	private void recalculatePosition() {
 		caret = text.getCaretLocation();
 
@@ -543,7 +580,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		}
 	}
 
-	
+
 	/**
 	 * @return current location of the SuggestionBubble on the screen.
 	 */
@@ -577,7 +614,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		Suggestion suggestion = (Suggestion) selection.getFirstElement();
 
 		String s = suggestion.getText();
-		
+
 		//Filter out [(].*[% match)]
 		if(s.lastIndexOf("(") != -1){
 			s = s.substring(0,s.lastIndexOf("(")-1);
@@ -587,7 +624,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 			//Ignore call
 			return;
 		}
-		
+
 		((NullableText) text.getParent()).setText(s);
 		AbstractMessagesEditor part = (AbstractMessagesEditor) PlatformUI.getWorkbench().
 				getActiveWorkbenchWindow().getActivePage().getActivePart();
