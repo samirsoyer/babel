@@ -11,8 +11,6 @@
 package org.eclipse.babel.editor.widgets.suggestion;
 
 import java.awt.Frame;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -61,10 +59,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.EditorPart;
-import org.eclipse.ui.part.WorkbenchPart;
 
 /**
  * Auto complete pop-up dialog that displays translation suggestions from
