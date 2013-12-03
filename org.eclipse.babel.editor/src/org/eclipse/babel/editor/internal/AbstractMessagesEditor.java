@@ -9,7 +9,6 @@
  *    Pascal Essiembre - initial API and implementation
  *    Alexej Strelzow - TapJI integration, bug fixes & enhancements
  *                    - issue 35, 36, 48, 73
- *    Samir Soyer     - Suggestion Bubble integration                 
  ******************************************************************************/
 package org.eclipse.babel.editor.internal;
 
@@ -96,8 +95,6 @@ public abstract class AbstractMessagesEditor extends MultiPageEditorPart
     protected IFile file; // init
 
     protected boolean updateSelectedKey;
-    
-    private boolean dirty = false;
 
     /**
      * Creates a multi-page editor example.
@@ -229,28 +226,6 @@ public abstract class AbstractMessagesEditor extends MultiPageEditorPart
 
         // remove entry from i18n page
         i18nPage.removeI18NEntry(messagesBundle.getLocale());        
-    }
-    
-    /**
-     * Sets this part to dirty or vice versa
-     * @param dirty
-     */
-    public void setDirty(boolean dirty){
-    	this.dirty=dirty;
-    	if(dirty){
-    		super.handlePropertyChange(IEditorPart.PROP_DIRTY);
-    	}
-    }
-    
-    /**
-     * @see org.eclipse.ui.part.MultiPageEditorPart#isDirty()
-     */
-    @Override
-    public boolean isDirty(){
-    	if(dirty){
-    		return true;
-    	}
-    	return super.isDirty();
     }
 
     /**

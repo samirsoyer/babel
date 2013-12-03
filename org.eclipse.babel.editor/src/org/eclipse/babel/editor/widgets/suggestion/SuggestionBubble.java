@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import org.eclipse.babel.editor.internal.AbstractMessagesEditor;
 import org.eclipse.babel.editor.widgets.NullableText;
 import org.eclipse.babel.editor.widgets.suggestion.exception.SuggestionErrors;
 import org.eclipse.babel.editor.widgets.suggestion.filter.SuggestionFilter;
@@ -59,7 +58,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * Auto complete pop-up dialog that displays translation suggestions from
@@ -620,12 +618,8 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 			return;
 		}
 
-		((NullableText) text.getParent()).setText(s);
-		AbstractMessagesEditor part = (AbstractMessagesEditor) PlatformUI.getWorkbench().
-				getActiveWorkbenchWindow().getActivePage().getActivePart();
-		if(part != null){
-			part.setDirty(true);
-		}
+		((NullableText) text.getParent()).setText(s,true);
+		
 		dialog.close();
 	}
 

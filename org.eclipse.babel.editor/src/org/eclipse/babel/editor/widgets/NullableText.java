@@ -44,6 +44,7 @@ public class NullableText extends Composite {
     private final Color defaultColor;
     private final Color nullColor;
     private Locale locale;
+    private boolean dirty;
 
     private boolean isnull;
 
@@ -124,6 +125,38 @@ public class NullableText extends Composite {
         
         Stack<String> undoCache = (Stack<String>) this.text.getData("UNDO");
         undoCache.push(this.text.getText());
+    }
+    
+    /**
+     * Sets this <code>NullableText</code> to dirty or vice versa
+     * @param dirty
+     */
+    public void setDirty(boolean dirty){
+    	this.dirty=dirty;
+    }
+    
+    /**
+	 * This method returns whether the content of this <code> NullableText</code>
+	 * have changed since the last save.
+	 * 
+	 * @return <code>true</code> if this NullableText is dirty;
+	 *         <code>false</code> otherwise.
+	 */
+    public boolean isDirty(){
+    	return dirty;
+    }
+    
+    
+    /**
+     * Applies the string to <code>NullableText</code> and makes it dirty,
+     * depending on the value of <code> dirty </code>
+     * @param text is the string to be applied to <code> NullableText </code>
+     * @param dirty whether setting text should make this 
+     * <code>NullableText</code> dirty.
+     */
+    public void setText(String text, boolean dirty){
+    	this.dirty = dirty;
+    	setText(text);
     }
 
     public String getText() {

@@ -33,6 +33,8 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
@@ -215,6 +217,16 @@ public abstract class AbstractI18NEntry extends Composite {
 
         // Handle dirtyness
         textBox.addKeyListener(getKeyListener());
+        
+        textBox.getTextBox().addModifyListener(new ModifyListener(){
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if(textBox.isDirty()){
+					updateModel();
+					textBox.setDirty(false);
+				}
+			}
+        });
 
         editor.addChangeListener(msgEditorUpdateKey);
     }

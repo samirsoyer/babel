@@ -11,7 +11,6 @@
 package org.eclipse.babel.editor.widgets.suggestion;
 
 
-import org.eclipse.babel.editor.internal.AbstractMessagesEditor;
 import org.eclipse.babel.editor.widgets.NullableText;
 import org.eclipse.babel.editor.widgets.suggestion.exception.SuggestionErrors;
 import org.eclipse.jface.dialogs.PopupDialog;
@@ -34,7 +33,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * Child dialog of {@link SuggestionBubble}, which lets user to mark a part
@@ -92,16 +90,7 @@ public class PartialTranslationDialog {
 								PartialTranslationDialog.this.parent.getTextField().getParent();
 						
 						nText.setText(PartialTranslationDialog.this.parent
-								.getTextField().getText()+textField.getSelectionText());
-						
-//						PartialTranslationDialog.this.parent.
-//						getTextField().append(textField.getSelectionText());
-						
-						AbstractMessagesEditor part = (AbstractMessagesEditor) PlatformUI.getWorkbench().
-								getActiveWorkbenchWindow().getActivePage().getActivePart();
-						if(part != null){
-							part.setDirty(true);
-						}
+								.getTextField().getText()+textField.getSelectionText(),true);
 						
 						PartialTranslationDialog.this.parent.dispose();
 					}
