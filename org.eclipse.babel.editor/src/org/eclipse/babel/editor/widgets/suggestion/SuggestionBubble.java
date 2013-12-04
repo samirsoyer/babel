@@ -23,6 +23,9 @@ import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
 import org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProvider;
 import org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProviderListener;
 import org.eclipse.babel.editor.widgets.suggestion.provider.SuggestionProviderUtils;
+import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -58,6 +61,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 
 /**
  * Auto complete pop-up dialog that displays translation suggestions from
@@ -84,6 +90,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	private String targetLanguage;
 	private static String defaultText;
 	private String oldDefaultText = "";
+	private final String CONTENT_ASSIST; 
 
 
 	/**
@@ -109,22 +116,20 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		//		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
 
 		SuggestionProviderUtils.addSuggestionProviderUpdateListener(this);
-
+		
+		/*
+		 * Read shortcut of content assist (code completion) directly from
+		 * org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST
+		 * and save it to CONTENT_ASSIST final variable
+		 */ 		 
+		IBindingService bindingService = (IBindingService) 
+				PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+		
+		CONTENT_ASSIST = bindingService.getBestActiveBindingFormattedFor
+				(IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST); 
+		
 		init();
 	}
-
-	//	public static void addSuggestionProvider(ISuggestionProvider suggestionProvider) {
-	//		if(suggestionProviders == null){
-	//			suggestionProviders = new ArrayList<ISuggestionProvider>();
-	//		}
-	//		suggestionProviders.add(suggestionProvider);
-	//	}
-	//
-	//	public static void removeSuggestionProvider(ISuggestionProvider suggestionProvider) {
-	//		if(suggestionProviders != null){
-	//			suggestionProviders.remove(suggestionProvider);
-	//		}	
-	//	}
 
 
 	/**
@@ -262,13 +267,13 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 						&& tableViewer.getTable().getSelectionIndex() != -1) {
 					e.doit = false;
 				}
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-
-				// CTRL + SPACE listener
-				if ((e.stateMask & SWT.CTRL) != 0 && e.character == ' ') {
+				
+				int accelerator = SWTKeySupport.convertEventToUnmodifiedAccelerator(e);
+                KeyStroke keyStroke = SWTKeySupport.convertAcceleratorToKeyStroke(accelerator);
+                KeySequence sequence = KeySequence.getInstance(keyStroke);                
+				
+				if(sequence.format().equals(CONTENT_ASSIST)){
+					
 					if (isCreated()) {
 						if (noSug != null && !noSug.isDisposed()) {
 							noSug.dispose();
@@ -279,8 +284,13 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 						tableViewer.getTable().setSelection(0);
 					} else {
 						createDialog();
-					}
+					}					
+					e.doit = false;					
 				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
 
 				if (dialog == null || dialog.getShell() == null) {
 					return;
