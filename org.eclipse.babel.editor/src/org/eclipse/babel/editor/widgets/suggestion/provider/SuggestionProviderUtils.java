@@ -47,7 +47,7 @@ public class SuggestionProviderUtils {
 	}
 
 	/**
-	 * This method is to call after making updating a provider
+	 * This method is to call after updating a provider
 	 */
 	public static void fireSuggestionProviderUpdated(ISuggestionProvider provider){
 		for(ISuggestionProviderListener listener : listeners){

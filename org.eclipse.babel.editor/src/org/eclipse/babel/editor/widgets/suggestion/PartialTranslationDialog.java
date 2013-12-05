@@ -206,11 +206,12 @@ public class PartialTranslationDialog {
 	}
 
 	/**
-	 * Creates or disposes the dialog.
-	 * @param visible if it is true and dialog is not already created,
-	 * it will be created and made visible. If it is false, 
-	 * dialog will be disposed. 
+	 * Creates a new dialog. If it is already created, it updates its
+	 * text.
 	 * @param text is the string to displayed in the dialog
+	 * @param orientation is the text alignment for the specific
+	 * language/locale, which should be either <code>SWT.LEFT_TO_RIGHT</code> 
+	 * or <code>SWT.RIGHT_TO_LEFT</code>.
 	 */
 	public void openDialog(String text, int orientation){
 		
