@@ -16,6 +16,7 @@ import java.util.Stack;
 
 import org.eclipse.babel.editor.util.UIUtils;
 import org.eclipse.babel.editor.widgets.suggestion.SuggestionBubble;
+import org.eclipse.babel.editor.widgets.suggestion.provider.SuggestionProviderUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -45,6 +46,7 @@ public class NullableText extends Composite {
     private final Color nullColor;
     private Locale locale;
     private boolean dirty;
+    private boolean suggestionBubbleOn;
 
     private boolean isnull;
 
@@ -87,15 +89,20 @@ public class NullableText extends Composite {
         initComponents();
         this.locale=locale;
         
-        if(locale != null){
-        	new SuggestionBubble(text,locale.getLanguage()); 	
-        }else{
-        	text.addModifyListener(new ModifyListener(){
-				@Override
-				public void modifyText(ModifyEvent e) {
-					SuggestionBubble.setDefaultText(text.getText());
-				}
-        	});
+        suggestionBubbleOn = !SuggestionProviderUtils.getSuggetionProviders()
+        						.isEmpty();
+        
+        if(suggestionBubbleOn){
+        	if(locale != null){
+        		new SuggestionBubble(text,locale.getLanguage()); 	
+        	}else{
+        		text.addModifyListener(new ModifyListener(){
+        			@Override
+        			public void modifyText(ModifyEvent e) {
+        				SuggestionBubble.setDefaultText(text.getText());
+        			}
+        		});
+        	}
         }
     }
     
@@ -110,7 +117,7 @@ public class NullableText extends Composite {
     public void setText(String text) {
         isnull = text == null;
         
-        if(locale == null){
+        if(locale == null && suggestionBubbleOn){
         	SuggestionBubble.setDefaultText(text);
         }
         

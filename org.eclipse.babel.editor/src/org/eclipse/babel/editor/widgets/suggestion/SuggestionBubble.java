@@ -12,6 +12,8 @@ package org.eclipse.babel.editor.widgets.suggestion;
 
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -86,11 +88,14 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	private PartialTranslationDialog partialTranslationDialog;
 	private ArrayList<Suggestion> suggestions;
 	//	private static ArrayList<ISuggestionProvider> suggestionProviders;
-	private String languageSource = "EN > ";
 	private String targetLanguage;
-	private static String defaultText;
 	private String oldDefaultText = "";
+	private static String defaultText;
+	private final String SRC_LANG = "EN > ";
 	private final String CONTENT_ASSIST; 
+	private final Level LOG_LEVEL = Level.INFO;
+	
+	private static final Logger LOGGER = Logger.getLogger(SuggestionBubble.class.getName());
 
 
 	/**
@@ -149,9 +154,12 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 	private void updateSuggestions() {		
 		if(!oldDefaultText.equals(defaultText)){
-
+			
 			ArrayList<ISuggestionProvider> providers =
 					SuggestionProviderUtils.getSuggetionProviders();
+			
+			LOGGER.log(LOG_LEVEL,"size of suggestions: "
+					+suggestions.size()+", size of providers: "+providers.size());
 
 			suggestions.clear();
 
@@ -398,7 +406,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		boolean persistLocation = false;
 		boolean showDialogMenu = false;
 		boolean showPersistActions = false;
-		String titleText = "Suggestions (" + languageSource+targetLanguage.toUpperCase() + ")";
+		String titleText = "Suggestions (" + SRC_LANG+targetLanguage.toUpperCase() + ")";
 		String infoText = "Ctrl+Space to display all suggestions";
 		dialog = new PopupDialog(shell, shellStyle, takeFocusOnOpen,
 				persistSize, persistLocation, showDialogMenu,
@@ -661,6 +669,9 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	 */
 	@Override
 	public void suggestionProviderUpdated(ISuggestionProvider provider, int index) {
+		
+		LOGGER.log(LOG_LEVEL, "provider :"+provider.getClass().getSimpleName()+
+				", index: "+index+", size of suggestions: "+suggestions.size());
 
 		if(suggestions.size() > index){
 			suggestions
