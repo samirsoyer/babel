@@ -50,6 +50,7 @@ public class PartialTranslationDialog {
 	private final String FOOT_NOTE_1 = "Click for focus";
 	private final String FOOT_NOTE_2 = "Mark the text, which will be used as translation, then click on 'Apply' button";
 	private String infoText;
+	private String text;
 
 	/**
 	 * The constructor
@@ -61,7 +62,7 @@ public class PartialTranslationDialog {
 		this.shell=shell;
 	}
 
-	private void createDialog(final String text, final int shellStyle){
+	private void createDialog(final int shellStyle){
 
 		//		int shellStyle = PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE;
 		boolean takeFocusOnOpen = false;
@@ -174,7 +175,7 @@ public class PartialTranslationDialog {
 						}
 						dialog.close();
 						infoText = FOOT_NOTE_2;
-						createDialog(text,PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE);
+						createDialog(PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE);
 						dialog.open();
 						dialog.getShell().setFocus();
 
@@ -212,12 +213,13 @@ public class PartialTranslationDialog {
 	 * @param text is the string to displayed in the dialog
 	 */
 	public void setVisible(boolean visible, String text){
+		this.text=text;
 		if(visible){
 			if(dialog != null && dialog.getShell() != null){
 				textField.setText(text);		
 			}else{
 				infoText = FOOT_NOTE_1;
-				createDialog(text, PopupDialog.INFOPOPUP_SHELLSTYLE);
+				createDialog(PopupDialog.INFOPOPUP_SHELLSTYLE);
 				dialog.open();
 			}
 
