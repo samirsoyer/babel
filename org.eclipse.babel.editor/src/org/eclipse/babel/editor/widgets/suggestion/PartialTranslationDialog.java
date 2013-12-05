@@ -51,6 +51,7 @@ public class PartialTranslationDialog {
 	private final String FOOT_NOTE_2 = "Mark the text, which will be used as translation, then click on 'Apply' button";
 	private String infoText;
 	private String text;
+	private int orientation;
 
 	/**
 	 * The constructor
@@ -77,7 +78,7 @@ public class PartialTranslationDialog {
 			@Override
 			protected Control createDialogArea(Composite parent) {
 				composite = (Composite) super.createDialogArea(parent);	
-				
+
 				composite.setLayout(new GridLayout(2,false));
 
 				final Button button = new Button(composite, SWT.PUSH);
@@ -89,51 +90,50 @@ public class PartialTranslationDialog {
 					public void widgetSelected(SelectionEvent e) {
 						NullableText nText = (NullableText) 
 								PartialTranslationDialog.this.parent.getTextField().getParent();
-						
+
 						nText.setText(PartialTranslationDialog.this.parent
 								.getTextField().getText()+textField.getSelectionText(),true);
-						
+
 						PartialTranslationDialog.this.parent.dispose();
 					}
 
 					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {	
 					}
-					
+
 				});
-				
+
 				Label label = new Label(composite, SWT.NONE);
 				label.setText("Selected translation");
-				
+
 				FontData fontData = label.getFont().getFontData()[0];
 				Font font = new Font(label.getDisplay(), new FontData(fontData.getName(), fontData
-				    .getHeight(), SWT.BOLD));
+						.getHeight(), SWT.BOLD));
 				label.setFont(font);
-				
+
 				//Invisible separator
 				new Label(composite, SWT.NONE);
-				
-				textField = new Text(composite, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+
+				textField = new Text(composite, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | orientation);
 				textField.setText(text);				
 				textField.setLayoutData( new GridData(SWT.FILL, SWT.FILL,true,true,2,1));
-				
 				textField.addListener(SWT.MouseUp, new Listener() {
 
-			        @Override
-			        public void handleEvent(Event event) {
-			            Text text = (Text) event.widget;
+					@Override
+					public void handleEvent(Event event) {
+						Text text = (Text) event.widget;
 
-			            String selection = text.getSelectionText();
+						String selection = text.getSelectionText();
 
-			            if(selection.length() > 0 && 
-			            		!SuggestionErrors.contains(textField.getText()))
-			            {
-			                button.setEnabled(true);
-			            }else{
-			            	button.setEnabled(false);
-			            }
-			        }
-			    });
+						if(selection.length() > 0 && 
+								!SuggestionErrors.contains(textField.getText()))
+						{
+							button.setEnabled(true);
+						}else{
+							button.setEnabled(false);
+						}
+					}
+				});
 
 				return composite;
 			}
@@ -144,17 +144,17 @@ public class PartialTranslationDialog {
 
 				Point start = parent.getCurrentLocation();				
 				Point size = parent.getSize();
-				
+
 				int x = start.x + size.x;
 				int y = start.y;
 				int screenWidth = Display.getCurrent().getBounds().width;
-				
+
 				if(screenWidth - x <= 200){
 					x = start.x - 450;
 				}
-				
+
 				getShell().setLocation(x,y);
-				
+
 				if(screenWidth - x < 450){
 					getShell().setSize(screenWidth - x, 200);
 				}else{
@@ -212,23 +212,31 @@ public class PartialTranslationDialog {
 	 * dialog will be disposed. 
 	 * @param text is the string to displayed in the dialog
 	 */
-	public void setVisible(boolean visible, String text){
-		this.text=text;
-		if(visible){
-			if(dialog != null && dialog.getShell() != null){
-				textField.setText(text);		
-			}else{
-				infoText = FOOT_NOTE_1;
-				createDialog(PopupDialog.INFOPOPUP_SHELLSTYLE);
-				dialog.open();
-			}
-
-
+	public void openDialog(String text, int orientation){
+		
+		if(SuggestionErrors.contains(text)){
+			return;
 		}
-		if(!visible && dialog != null){
+		
+		this.text=text;
+		this.orientation=orientation;
+		if(dialog != null && dialog.getShell() != null){
+			textField.setText(text);		
+		}else{
+			infoText = FOOT_NOTE_1;
+			createDialog(PopupDialog.INFOPOPUP_SHELLSTYLE);
+			dialog.open();
+		}
+
+	}
+
+	/**
+	 * Disposes this dialog.
+	 */
+	public void dispose(){
+		if(dialog != null){
 			dialog.close();
 		}
-
 	}
 
 	/**
@@ -238,7 +246,7 @@ public class PartialTranslationDialog {
 	public boolean isCursorInsideDialog(){
 
 		if(dialog == null || dialog.getShell() == null || 
-				 dialog.getShell().isDisposed()){
+				dialog.getShell().isDisposed()){
 			return false;
 		}
 

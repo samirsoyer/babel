@@ -390,7 +390,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 				if (partialTranslationDialog != null
 						&& !partialTranslationDialog.isCursorInsideDialog()) {
-					partialTranslationDialog.setVisible(false, "");
+					partialTranslationDialog.dispose();
 				}
 			}
 
@@ -484,10 +484,9 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 					public void selectionChanged(
 							SelectionChangedEvent event) {
 						if (tableViewer.getTable().getSelection().length > 0) {
-							partialTranslationDialog.setVisible(true,
-									tableViewer.getTable()
-									.getSelection()[0]
-											.getText());
+							partialTranslationDialog.openDialog(
+									tableViewer.getTable().getSelection()[0]
+											.getText(),text.getOrientation());
 						}
 					}
 				});
@@ -529,7 +528,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 		dialog.getShell().addListener(SWT.Resize,  new Listener () {
 			public void handleEvent(Event e) {
-				partialTranslationDialog.setVisible(false, "");
+				partialTranslationDialog.dispose();
 			}
 		});
 
