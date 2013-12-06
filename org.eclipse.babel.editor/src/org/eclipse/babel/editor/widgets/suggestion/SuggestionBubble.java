@@ -292,6 +292,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 						tableViewer.getTable().setSelection(0);
 					} else {
 						createDialog();
+						suggestionFilter.setSearchText(text.getText().trim());
 					}					
 					e.doit = false;					
 				}
