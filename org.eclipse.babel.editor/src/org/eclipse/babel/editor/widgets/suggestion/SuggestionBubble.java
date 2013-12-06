@@ -52,9 +52,12 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -62,6 +65,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
@@ -83,7 +87,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	private Point caret;
 	private SuggestionFilter suggestionFilter;
 	private Composite composite;
-	private Composite loadingCircle;
+	private ScrolledComposite scrollComposite;
 	private Label noSug;
 	private PartialTranslationDialog partialTranslationDialog;
 	private ArrayList<Suggestion> suggestions;
@@ -94,7 +98,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	private final String SRC_LANG = "EN > ";
 	private final String CONTENT_ASSIST; 
 	private final Level LOG_LEVEL = Level.INFO;
-	
+
 	private static final Logger LOGGER = Logger.getLogger(SuggestionBubble.class.getName());
 
 
@@ -121,7 +125,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		//		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
 
 		SuggestionProviderUtils.addSuggestionProviderUpdateListener(this);
-		
+
 		/*
 		 * Read shortcut of content assist (code completion) directly from
 		 * org.eclipse.ui.IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST
@@ -129,10 +133,10 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		 */ 		 
 		IBindingService bindingService = (IBindingService) 
 				PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-		
+
 		CONTENT_ASSIST = bindingService.getBestActiveBindingFormattedFor
 				(IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST); 
-		
+
 		init();
 	}
 
@@ -154,20 +158,67 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 	private void updateSuggestions() {		
 		if(!oldDefaultText.equals(defaultText)){
-			
+
 			ArrayList<ISuggestionProvider> providers =
 					SuggestionProviderUtils.getSuggetionProviders();
-			
+
 			LOGGER.log(LOG_LEVEL,"size of suggestions: "
 					+suggestions.size()+", size of providers: "+providers.size());
 
 			suggestions.clear();
 
-			for (ISuggestionProvider provider : providers) {
-				suggestions
-				.add(provider.getSuggestion(defaultText, targetLanguage));
+			final Display d = Display.getCurrent();
+			for (final ISuggestionProvider provider : providers) {
+
+				Thread fetch = new Thread(){
+					Composite loadingCircle;
+
+					@Override
+					public void run(){
+						if(!d.isDisposed()){
+							d.asyncExec(new Runnable(){
+								@Override
+								public void run(){
+
+									//Show circle
+									if(!composite.isDisposed()){
+										loadingCircle =
+												createLoadingCircle();
+									}
+								}
+							});
+						}
+
+						//Do the work
+						suggestions
+						.add(provider
+								.getSuggestion(defaultText, targetLanguage));
+
+						if(!d.isDisposed()){
+							d.asyncExec(new Runnable(){
+								@Override
+								public void run(){
+
+									//remove laoding circle
+									if(!composite.isDisposed()){
+										loadingCircle.dispose();
+										tableViewer.setInput(suggestions
+												.toArray());
+										pack();
+										composite.layout();										
+									}
+								}
+							});
+						}
+					}
+				};
+				fetch.start();			
 			}
 			oldDefaultText = defaultText;
+		}else{
+			tableViewer.setInput(suggestions
+					.toArray());
+			pack();
 		}
 	}
 
@@ -275,13 +326,13 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 						&& tableViewer.getTable().getSelectionIndex() != -1) {
 					e.doit = false;
 				}
-				
+
 				int accelerator = SWTKeySupport.convertEventToUnmodifiedAccelerator(e);
-                KeyStroke keyStroke = SWTKeySupport.convertAcceleratorToKeyStroke(accelerator);
-                KeySequence sequence = KeySequence.getInstance(keyStroke);                
-				
+				KeyStroke keyStroke = SWTKeySupport.convertAcceleratorToKeyStroke(accelerator);
+				KeySequence sequence = KeySequence.getInstance(keyStroke);                
+
 				if(sequence.format().equals(CONTENT_ASSIST)){
-					
+
 					if (isCreated()) {
 						if (noSug != null && !noSug.isDisposed()) {
 							noSug.dispose();
@@ -415,21 +466,22 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 			@Override
 			protected Control createDialogArea(Composite parent) {
-				composite = (Composite) super.createDialogArea(parent);
+				scrollComposite = new ScrolledComposite(
+						(Composite) super.createDialogArea(parent),
+						SWT.V_SCROLL | SWT.H_SCROLL); 
+				scrollComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+				scrollComposite.setExpandVertical(true);
+				scrollComposite.setExpandHorizontal(true);
 
-				//Create loading cicle
-				loadingCircle = new Composite(composite, SWT.EMBEDDED | SWT.NO_BACKGROUND);
-				Frame frame = SWT_AWT.new_Frame(loadingCircle);				
-				ImageIcon imageIcon = new ImageIcon(this.getClass().getResource("/icons/ajax-loader.gif"));
-				JLabel label = new JLabel(imageIcon);
-				frame.add(label);
-				frame.setBackground(new java.awt.Color(255, 255, 225));	
+				GridLayout gl = new GridLayout(1,true);
+				gl.verticalSpacing=0;	
+				composite = new Composite(scrollComposite,SWT.NONE);				
+				composite.setLayout(gl);				
+				scrollComposite.setContent(composite);
 
-				loadingCircle.setLayoutData(new GridData(GridData.CENTER,SWT.TOP,false,false));
-
-				tableViewer = new TableViewer(composite, SWT.V_SCROLL);
+				tableViewer = new TableViewer(composite, SWT.NO_SCROLL);
 				tableViewer.getTable().setLayoutData(
-						new GridData(GridData.FILL_BOTH));
+						new GridData(GridData.FILL, SWT.TOP,true,false));
 
 				tableViewer.setContentProvider(new ArrayContentProvider());
 				tableViewer.setLabelProvider(new ITableLabelProvider() {
@@ -505,8 +557,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 				// });
 
 				tableViewer.getTable().setSelection(0);
-
-				return composite;
+				return scrollComposite;
 			}
 
 			@Override
@@ -533,26 +584,38 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 			}
 		});
 
-		final Display d = Display.getCurrent();
-		Thread fetch = new Thread(){
-			@Override
-			public void run(){
-				updateSuggestions();
-				d.asyncExec(new Runnable(){
-					@Override
-					public void run(){
+		updateSuggestions();
+	}
 
-						//remove laoding circle
-						if(!composite.isDisposed()){
-							loadingCircle.dispose();
-							tableViewer.setInput(suggestions.toArray());
-							composite.layout();
-						}
-					}
-				});
+	private void pack(){		
+		Point temp = new Point(0, 0);
+		Point max = new Point(0, 0);
+
+		for(TableItem item : tableViewer.getTable().getItems()){
+			temp.x = item.getBounds().width;
+			temp.y = item.getBounds().height;
+			if(temp.x > max.x){
+				max.x = temp.x;
 			}
-		};
-		fetch.start();
+			max.y=max.y+temp.y;
+		}
+		scrollComposite.setMinSize(max);
+	}
+
+	private Composite createLoadingCircle(){
+		//Create loading cicle
+		Composite loadingCircle = new Composite(composite, SWT.EMBEDDED | SWT.NO_BACKGROUND);		
+		Frame frame = SWT_AWT.new_Frame(loadingCircle);
+		ImageIcon imageIcon = new ImageIcon(this.getClass().getResource("/icons/ajax-loader.gif"));
+		JLabel label = new JLabel(imageIcon);
+		frame.add(label);
+		frame.setBackground(new java.awt.Color(255, 255, 225));
+
+		GridData gd = new GridData(GridData.BEGINNING,SWT.TOP,false,false);
+		gd.heightHint=16;
+		gd.widthHint=16;
+		loadingCircle.setLayoutData(gd);
+		return loadingCircle;
 	}
 
 	/**
@@ -637,7 +700,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		}
 
 		((NullableText) text.getParent()).setText(s,true);
-		
+
 		dialog.close();
 	}
 
@@ -669,7 +732,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	 */
 	@Override
 	public void suggestionProviderUpdated(ISuggestionProvider provider, int index) {
-		
+
 		LOGGER.log(LOG_LEVEL, "provider :"+provider.getClass().getSimpleName()+
 				", index: "+index+", size of suggestions: "+suggestions.size());
 
