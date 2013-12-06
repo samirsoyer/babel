@@ -1,5 +1,8 @@
 package org.eclipse.babel.editor.widgets.suggestion.provider;
 
+import java.util.Map;
+
+import org.eclipse.babel.editor.widgets.suggestion.exception.InvalidConfigurationSetting;
 import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
 
 
@@ -7,7 +10,9 @@ import org.eclipse.babel.editor.widgets.suggestion.model.Suggestion;
  * Interface for the suggestion providers which should implement
  *  {@link ISuggestionProvider.getSuggestion()} method to return
  *  provided suggestion
+ *  
  * @author Samir Soyer
+ * @author Martin Reiterer - Added suggestion provider configuration methods
  *
  */
 public interface ISuggestionProvider {
@@ -20,5 +25,22 @@ public interface ISuggestionProvider {
 	 * be translated
 	 * @return translation of original text
 	 */
-	public Suggestion getSuggestion(String original, String targetLanguage);
+	Suggestion getSuggestion(String original, String targetLanguage);
+	
+	/**
+	 * Returns a list of all configuration settings of the suggestion provider
+	 * 
+	 * @return The list of active configuration settings
+	 */
+	@SuppressWarnings("rawtypes")
+	Map<String, ISuggestionProviderConfigurationSetting> getAllConfigurationSettings();
+	
+	/**
+	 * Allows to update one particular configuration setting
+	 * 
+	 * @param setting The configuration Setting of type {@link ISuggestionProviderConfigurationSetting}}
+	 */
+	@SuppressWarnings("rawtypes")
+	void updateConfigurationSetting(String configurationId, ISuggestionProviderConfigurationSetting setting)
+		throws InvalidConfigurationSetting;
 }
