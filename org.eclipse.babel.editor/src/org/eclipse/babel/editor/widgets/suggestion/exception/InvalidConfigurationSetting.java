@@ -6,5 +6,9 @@ public class InvalidConfigurationSetting extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	public InvalidConfigurationSetting(String message){
+		super(message);
+	}
 
 }

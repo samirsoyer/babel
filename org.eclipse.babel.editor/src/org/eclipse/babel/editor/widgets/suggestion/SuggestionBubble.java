@@ -735,12 +735,13 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 		LOGGER.log(LOG_LEVEL, "provider :"+provider.getClass().getSimpleName()+
 				", index: "+index+", size of suggestions: "+suggestions.size());
-
-		if(suggestions.size() > index){
-			suggestions
-			.set(index,provider.getSuggestion(defaultText, targetLanguage));
-		}else{
-			suggestions.add(provider.getSuggestion(defaultText, targetLanguage));
+		
+		for(int i=0;i<suggestions.size();i++){
+			Suggestion sug = suggestions.get(i);
+			if(sug.getProvider().equals(provider)){
+				suggestions.set(i, provider
+						.getSuggestion(defaultText, targetLanguage));
+			}
 		}
 
 		if(tableViewer != null && !tableViewer.getTable().isDisposed()){			

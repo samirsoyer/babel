@@ -1,5 +1,6 @@
 package org.eclipse.babel.editor.widgets.suggestion.model;
 
+import org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProvider;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -12,15 +13,17 @@ public class Suggestion {
 	
 	private Image icon;
 	private String text;
+	private ISuggestionProvider provider;
 
 	/**
 	 * @param icon is the image of suggestion provider which 
 	 * provides the translation of the text
 	 * @param text is the translated suggestion
 	 */
-	public Suggestion(Image icon, String text) {
+	public Suggestion(Image icon, String text, ISuggestionProvider provider) {
 		this.icon = icon;
 		this.text = text;
+		this.provider=provider;
 	}
 
 	/**
@@ -50,5 +53,22 @@ public class Suggestion {
 	public void setText(String text) {
 		this.text = text;
 	}
+
+	/**
+	 * @return  {@link ISuggestionProvider} that provides
+	 * this suggestion
+	 */
+	public ISuggestionProvider getProvider() {
+		return provider;
+	}
+
+	/**
+	 * @param provider is the {@link ISuggestionProvider} that provides
+	 * this suggestion
+	 */
+	public void setProvider(ISuggestionProvider provider) {
+		this.provider = provider;
+	}
+	
 	
 }

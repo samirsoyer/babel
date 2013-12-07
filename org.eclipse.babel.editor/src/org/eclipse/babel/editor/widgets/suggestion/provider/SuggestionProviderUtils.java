@@ -2,6 +2,8 @@ package org.eclipse.babel.editor.widgets.suggestion.provider;
 
 import java.util.ArrayList;
 
+import org.eclipse.babel.editor.widgets.suggestion.exception.InvalidConfigurationSetting;
+
 /**
  * This class contains a list of all suggestion providers.
  * {@link org.eclipse.babel.editor.widgets.suggestion.SuggestionBubble} gets its suggestion providers from this class,
@@ -26,7 +28,7 @@ public class SuggestionProviderUtils {
 	public static void removeSuggestionProvider(ISuggestionProvider provider) {
 		providers.remove(provider);
 	}
-	
+
 	/**
 	 * @return all the registered suggestion providers
 	 */
@@ -54,5 +56,27 @@ public class SuggestionProviderUtils {
 			listener.suggestionProviderUpdated(provider, SuggestionProviderUtils.
 					getSuggetionProviders().indexOf(provider));
 		}
+	}
+
+
+	/**
+	 * Allows to update one particular configuration setting
+	 * 
+	 * @param setting The configuration Setting of type {@link ISuggestionProviderConfigurationSetting}}
+	 */
+	public static void updateConfigurationSetting(String configurationId,
+			ISuggestionProviderConfigurationSetting setting)
+					throws InvalidConfigurationSetting{
+
+		for(ISuggestionProvider provider : providers){
+			
+			if(provider.getAllConfigurationSettings().containsKey(configurationId)){
+				provider.updateConfigurationSetting(configurationId, setting);
+				fireSuggestionProviderUpdated(provider);
+			}
+		}
+
+		
+
 	}
 }
