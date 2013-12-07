@@ -22,9 +22,18 @@ public class SuggestionProviderUtils {
 	 * @param provider is the suggestion provider to be registered
 	 */
 	public static void addSuggestionProvider(ISuggestionProvider provider) {
-		providers.add(provider);
+		if(!providers.contains(provider)){
+			providers.add(provider);
+		}
 	}
 
+	/**
+	 * Removes a specific {@link ISuggestionProvider} from the list of
+	 * suggestion providers.
+	 * 
+	 * @param provider is the {@link ISuggestionProvider} to be removed from
+	 * the list
+	 */
 	public static void removeSuggestionProvider(ISuggestionProvider provider) {
 		providers.remove(provider);
 	}
@@ -53,8 +62,7 @@ public class SuggestionProviderUtils {
 	 */
 	public static void fireSuggestionProviderUpdated(ISuggestionProvider provider){
 		for(ISuggestionProviderListener listener : listeners){
-			listener.suggestionProviderUpdated(provider, SuggestionProviderUtils.
-					getSuggetionProviders().indexOf(provider));
+			listener.suggestionProviderUpdated(provider);
 		}
 	}
 

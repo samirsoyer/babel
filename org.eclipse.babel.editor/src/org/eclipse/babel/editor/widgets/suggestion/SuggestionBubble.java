@@ -729,10 +729,10 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	 * @see org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProviderListener#suggestionProviderUpdated(org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProvider, int)
 	 */
 	@Override
-	public void suggestionProviderUpdated(ISuggestionProvider provider, int index) {
+	public void suggestionProviderUpdated(ISuggestionProvider provider) {
 
 		LOGGER.log(LOG_LEVEL, "provider :"+provider.getClass().getSimpleName()+
-				", index: "+index+", size of suggestions: "+suggestions.size());
+				", size of suggestions: "+suggestions.size());
 		
 		for(int i=0;i<suggestions.size();i++){
 			Suggestion sug = suggestions.get(i);
