@@ -113,13 +113,11 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		text = parent;
 		this.targetLanguage=targetLanguage;
 
-		//		suggestionProviders = new ArrayList<ISuggestionProvider>();
 		suggestionFilter = new SuggestionFilter();
 		suggestions = new ArrayList<Suggestion>();
 
 		//		MessagesEditorPlugin.getDefault().getBundle().
 		//		getEntry("glossary.xml").getPath()
-
 		//		System.out.println("install path "+MessagesEditorPlugin.getDefault().getBundle().getEntry("/").getPath()+"glossary.xml");
 
 		SuggestionProviderUtils.addSuggestionProviderUpdateListener(this);
@@ -387,9 +385,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 				if (e.keyCode == SWT.CR || e.keyCode == SWT.LF) {
 					applySuggestion(text);
 				}
-
 			}
-
 		});
 
 		// FocusListener
@@ -401,7 +397,6 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 				if (!isCreated() && text.getText().length() == 0) {
 					createDialog();
 				}
-
 			}
 
 			@Override
@@ -410,7 +405,6 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 					dialog.close();
 				}
 			}
-
 		});
 
 		text.addMouseListener(new MouseListener() {
@@ -443,9 +437,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 					partialTranslationDialog.dispose();
 				}
 			}
-
 		});
-
 	}
 
 	private void createDialog() {
@@ -733,7 +725,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 		LOGGER.log(LOG_LEVEL, "provider :"+provider.getClass().getSimpleName()+
 				", size of suggestions: "+suggestions.size());
-		
+
 		for(int i=0;i<suggestions.size();i++){
 			Suggestion sug = suggestions.get(i);
 			if(sug.getProvider().equals(provider)){
@@ -745,7 +737,6 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		if(tableViewer != null && !tableViewer.getTable().isDisposed()){			
 			tableViewer.setInput(suggestions);
 		}
-
 	}
 }
 

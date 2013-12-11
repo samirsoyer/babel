@@ -77,14 +77,13 @@ public class SuggestionProviderUtils {
 					throws InvalidConfigurationSetting{
 
 		for(ISuggestionProvider provider : providers){
-			
 			if(provider.getAllConfigurationSettings().containsKey(configurationId)){
 				provider.updateConfigurationSetting(configurationId, setting);
 				fireSuggestionProviderUpdated(provider);
 			}
 		}
 
-		
+
 
 	}
 }
