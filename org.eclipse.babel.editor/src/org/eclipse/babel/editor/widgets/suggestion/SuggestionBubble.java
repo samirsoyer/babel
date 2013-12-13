@@ -93,7 +93,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 	private String targetLanguage;
 	private String oldDefaultText = "";
 	private static String defaultText;
-	private final String SRC_LANG = "EN > ";
+	private String SRC_LANG = "EN";
 	private final String CONTENT_ASSIST; 
 	private final Level LOG_LEVEL = Level.INFO;
 
@@ -115,6 +115,12 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 
 		suggestionFilter = new SuggestionFilter();
 		suggestions = new ArrayList<Suggestion>();
+		
+		String srcLang =
+				System.getProperty("tapiji.translator.default.language");
+		if(srcLang!=null){
+			SRC_LANG = srcLang.substring(0, 2).toUpperCase(); 
+		}
 
 		//		MessagesEditorPlugin.getDefault().getBundle().
 		//		getEntry("glossary.xml").getPath()
@@ -448,7 +454,7 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 		boolean persistLocation = false;
 		boolean showDialogMenu = false;
 		boolean showPersistActions = false;
-		String titleText = "Suggestions (" + SRC_LANG+targetLanguage.toUpperCase() + ")";
+		String titleText = "Suggestions (" + SRC_LANG+" > "+targetLanguage.toUpperCase() + ")";
 		String infoText = "Ctrl+Space to display all suggestions";
 		dialog = new PopupDialog(shell, shellStyle, takeFocusOnOpen,
 				persistSize, persistLocation, showDialogMenu,
