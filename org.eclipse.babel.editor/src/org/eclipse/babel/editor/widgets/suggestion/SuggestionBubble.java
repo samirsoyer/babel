@@ -402,7 +402,9 @@ public class SuggestionBubble implements ISuggestionProviderListener{
 			public void focusGained(FocusEvent e) {
 
 				if (!isCreated() && text.getText().length() == 0) {
+					suggestionFilter.setSearchText("");
 					createDialog();
+					tableViewer.refresh();
 				}
 			}
 
