@@ -22,6 +22,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -114,11 +115,11 @@ public class PartialTranslationDialog {
 				//Invisible separator
 				new Label(composite, SWT.NONE);
 
-				textField = new Text(composite, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | orientation);
+				textField = new Text(composite, 
+						SWT.V_SCROLL | SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | orientation);
 				textField.setText(text);				
 				textField.setLayoutData( new GridData(SWT.FILL, SWT.FILL,true,true,2,1));
 				textField.addListener(SWT.MouseUp, new Listener() {
-
 					@Override
 					public void handleEvent(Event event) {
 						Text text = (Text) event.widget;
@@ -134,6 +135,19 @@ public class PartialTranslationDialog {
 						}
 					}
 				});
+
+				Listener scrollBarListener = new Listener (){
+					@Override
+					public void handleEvent(Event event) {
+						Text t = (Text)event.widget;
+						Rectangle r1 = t.getClientArea();
+						Rectangle r2 = t.computeTrim(r1.x, r1.y, r1.width, r1.height);
+						Point p = t.computeSize(composite.getSize().x,  SWT.DEFAULT,  true);
+						t.getVerticalBar().setVisible(r2.height <= p.y);
+					}
+				};
+
+				textField.addListener(SWT.Resize, scrollBarListener);
 
 				return composite;
 			}
@@ -214,11 +228,11 @@ public class PartialTranslationDialog {
 	 * or <code>SWT.RIGHT_TO_LEFT</code>.
 	 */
 	public void openDialog(String text, int orientation){
-		
+
 		if(SuggestionErrors.contains(text)){
 			return;
 		}
-		
+
 		this.text=text;
 		this.orientation=orientation;
 		if(dialog != null && dialog.getShell() != null){
