@@ -16,12 +16,13 @@ import org.eclipse.babel.editor.widgets.suggestion.exception.InvalidConfiguratio
 
 /**
  * This class contains a list of all suggestion providers.
- * {@link org.eclipse.babel.editor.widgets.suggestion.SuggestionBubble} gets its suggestion providers from this class,
- * therefore the ones that should be used in SuggestionBubble must be registered
- * in this class by calling {@link SuggestionProviderUtils.addSuggestionProvider()}
- * method
+ * {@link org.eclipse.babel.editor.widgets.suggestion.SuggestionBubble} gets its
+ * suggestion providers from this class, therefore the ones that should be used
+ * in SuggestionBubble must be registered in this class by calling {@link
+ * SuggestionProviderUtils.addSuggestionProvider()} method
+ * 
  * @author Samir Soyer
- *
+ * 
  */
 public class SuggestionProviderUtils {
 	private static ArrayList<ISuggestionProvider> providers = new ArrayList<ISuggestionProvider>();
@@ -29,10 +30,12 @@ public class SuggestionProviderUtils {
 
 	/**
 	 * Adds suggestion provider object to the list
-	 * @param provider is the suggestion provider to be registered
+	 * 
+	 * @param provider
+	 *            is the suggestion provider to be registered
 	 */
 	public static void addSuggestionProvider(ISuggestionProvider provider) {
-		if(!providers.contains(provider)){
+		if (!providers.contains(provider)) {
 			providers.add(provider);
 		}
 	}
@@ -41,8 +44,8 @@ public class SuggestionProviderUtils {
 	 * Removes a specific {@link ISuggestionProvider} from the list of
 	 * suggestion providers.
 	 * 
-	 * @param provider is the {@link ISuggestionProvider} to be removed from
-	 * the list
+	 * @param provider
+	 *            is the {@link ISuggestionProvider} to be removed from the list
 	 */
 	public static void removeSuggestionProvider(ISuggestionProvider provider) {
 		providers.remove(provider);
@@ -51,49 +54,53 @@ public class SuggestionProviderUtils {
 	/**
 	 * @return all the registered suggestion providers
 	 */
-	public static ArrayList<ISuggestionProvider> getSuggetionProviders(){
+	public static ArrayList<ISuggestionProvider> getSuggetionProviders() {
 		return providers;
 	}
 
 	/**
-	 * Adds a new suggestion provider listener, which calls 
-	 * {@link ISuggestionProviderListener.suggestionProviderUpdated()} method, when a
+	 * Adds a new suggestion provider listener, which calls {@link
+	 * ISuggestionProviderListener.suggestionProviderUpdated()} method, when a
 	 * suggestion provider object is updated
-	 * @param listener is the object, whose 
-	 * {@link ISuggestionProviderListener.suggestionProviderUpdated()} will be called, 
-	 * when the suggestion provider is updated
+	 * 
+	 * @param listener
+	 *            is the object, whose {@link
+	 *            ISuggestionProviderListener.suggestionProviderUpdated()} will
+	 *            be called, when the suggestion provider is updated
 	 */
-	public static void addSuggestionProviderUpdateListener(ISuggestionProviderListener listener){
+	public static void addSuggestionProviderUpdateListener(
+			ISuggestionProviderListener listener) {
 		listeners.add(listener);
 	}
 
 	/**
 	 * This method is to call after updating a provider
 	 */
-	public static void fireSuggestionProviderUpdated(ISuggestionProvider provider){
-		for(ISuggestionProviderListener listener : listeners){
+	public static void fireSuggestionProviderUpdated(
+			ISuggestionProvider provider) {
+		for (ISuggestionProviderListener listener : listeners) {
 			listener.suggestionProviderUpdated(provider);
 		}
 	}
 
-
 	/**
 	 * Allows to update one particular configuration setting
 	 * 
-	 * @param setting The configuration Setting of type {@link ISuggestionProviderConfigurationSetting}}
+	 * @param setting
+	 *            The configuration Setting of type
+	 *            {@link ISuggestionProviderConfigurationSetting}
 	 */
 	public static void updateConfigurationSetting(String configurationId,
 			ISuggestionProviderConfigurationSetting setting)
-					throws InvalidConfigurationSetting{
+			throws InvalidConfigurationSetting {
 
-		for(ISuggestionProvider provider : providers){
-			if(provider.getAllConfigurationSettings().containsKey(configurationId)){
+		for (ISuggestionProvider provider : providers) {
+			if (provider.getAllConfigurationSettings().containsKey(
+					configurationId)) {
 				provider.updateConfigurationSetting(configurationId, setting);
 				fireSuggestionProviderUpdated(provider);
 			}
 		}
-
-
 
 	}
 }

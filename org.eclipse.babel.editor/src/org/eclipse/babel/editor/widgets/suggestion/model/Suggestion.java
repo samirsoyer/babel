@@ -14,71 +14,77 @@ import org.eclipse.babel.editor.widgets.suggestion.provider.ISuggestionProvider;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * Encapsulates text of the suggestion and icon of the suggestion
- * provider, which provides the respective translation.
+ * Encapsulates text of the suggestion and icon of the suggestion provider,
+ * which provides the respective translation.
+ * 
  * @author Samir Soyer
- *
+ * 
  */
 public class Suggestion {
-	
+
 	private Image icon;
 	private String text;
 	private ISuggestionProvider provider;
 
 	/**
-	 * @param icon is the image of suggestion provider which 
-	 * provides the translation of the text
-	 * @param text is the translated suggestion
+	 * @param icon
+	 *            is the image of suggestion provider which provides the
+	 *            translation of the text
+	 * @param text
+	 *            is the translated suggestion
 	 */
 	public Suggestion(Image icon, String text, ISuggestionProvider provider) {
 		this.icon = icon;
 		this.text = text;
-		this.provider=provider;
+		this.provider = provider;
 	}
 
 	/**
-	 * @return Image object of the suggestion provider which 
-	 * provides the suggestion
+	 * @return Image object of the suggestion provider which provides the
+	 *         suggestion
 	 */
 	public Image getIcon() {
 		return icon;
 	}
+
 	/**
-	 * @param icon Image object of the suggestion provider which 
-	 * provides the suggestion
+	 * @param icon
+	 *            Image object of the suggestion provider which provides the
+	 *            suggestion
 	 */
 	public void setIcon(Image icon) {
 		this.icon = icon;
 	}
+
 	/**
 	 * @return translated text, i.e suggestion
 	 */
 	public String getText() {
 		return text;
 	}
-	
+
 	/**
-	 * @param text is the translated text, i.e suggestion
+	 * @param text
+	 *            is the translated text, i.e suggestion
 	 */
 	public void setText(String text) {
 		this.text = text;
 	}
 
 	/**
-	 * @return  {@link ISuggestionProvider} that provides
-	 * this suggestion
+	 * @return {@link ISuggestionProvider} that provides this suggestion
 	 */
 	public ISuggestionProvider getProvider() {
 		return provider;
 	}
 
 	/**
-	 * @param provider is the {@link ISuggestionProvider} that provides
-	 * this suggestion
+	 * @param provider
+	 *            is the {@link ISuggestionProvider} that provides this
+	 *            suggestion
 	 */
 	public void setProvider(ISuggestionProvider provider) {
 		this.provider = provider;
 	}
-	
-	
+
 }
