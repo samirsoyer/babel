@@ -93,7 +93,9 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 	private String targetLanguage;
 	private String oldDefaultText = "";
 	private static String defaultText;
+	private static boolean win;
 	private String SRC_LANG = "EN";
+	private static int SHELL_STYLE;
 	private final String CONTENT_ASSIST;
 	private final Level LOG_LEVEL = Level.INFO;
 
@@ -122,6 +124,14 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 				.getProperty("tapiji.translator.default.language");
 		if (srcLang != null) {
 			SRC_LANG = srcLang.substring(0, 2).toUpperCase();
+		}
+
+		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+			SHELL_STYLE = PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE;
+			win = true;
+		} else {
+			SHELL_STYLE = PopupDialog.HOVER_SHELLSTYLE;
+			win = false;
 		}
 
 		// MessagesEditorPlugin.getDefault().getBundle().
@@ -219,6 +229,7 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 		} else {
 			tableViewer.setInput(suggestions.toArray());
 			pack();
+			composite.layout();
 		}
 	}
 
@@ -243,6 +254,35 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 	}
 
 	private void init() {
+		// Focus handling simulation for non-Windows systems
+		if (!win) {
+			shell.getDisplay().addFilter(SWT.MouseDown, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+
+					if (isCursorInsideTextField()
+							&& text.getText().length() == 0 && !isCreated()
+							&& text.isFocusControl()) {
+						suggestionFilter.setSearchText("");
+						createDialog();
+						tableViewer.refresh();
+					} else {
+						if (partialTranslationDialog != null) {
+							if (!partialTranslationDialog
+									.isCursorInsideDialog()
+									&& !isCursorInsideDialog()) {
+								dispose();
+							}
+						} else {
+							if (!isCursorInsideDialog()) {
+								dispose();
+							}
+						}
+					}
+				}
+			});
+		}
+
 		// shell resize listener to dispose suggestion bubble
 		shell.addListener(SWT.Resize, new Listener() {
 			public void handleEvent(Event e) {
@@ -401,7 +441,7 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 			@Override
 			public void focusGained(FocusEvent e) {
 
-				if (!isCreated() && text.getText().length() == 0) {
+				if (win && !isCreated() && text.getText().length() == 0) {
 					suggestionFilter.setSearchText("");
 					createDialog();
 					tableViewer.refresh();
@@ -410,47 +450,49 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (dialog != null && !isCursorInsideDialog()) {
+				if (win && dialog != null && !isCursorInsideDialog()) {
 					dialog.close();
 				}
 			}
 		});
 
-		text.addMouseListener(new MouseListener() {
+		//MouseListener for Windows systems
+		if (win) {
+			text.addMouseListener(new MouseListener() {
 
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-				// Nothing to do
-			}
+				@Override
+				public void mouseDoubleClick(MouseEvent e) {
+					// Nothing to do
+				}
 
-			@Override
-			public void mouseDown(MouseEvent e) {
-				// Nothing to do
-			}
+				@Override
+				public void mouseDown(MouseEvent e) {
+					// Nothing to do
+				}
 
-			@Override
-			public void mouseUp(MouseEvent e) {
+				@Override
+				public void mouseUp(MouseEvent e) {
 
-				if (caret != null) {
-					if (dialog != null
-							&& !caret.equals(text.getCaretLocation())) {
-						dialog.close();
+					if (caret != null) {
+						if (dialog != null
+								&& !caret.equals(text.getCaretLocation())) {
+							dialog.close();
+							caret = text.getCaretLocation();
+						}
+					} else {
 						caret = text.getCaretLocation();
 					}
-				} else {
-					caret = text.getCaretLocation();
-				}
 
-				if (partialTranslationDialog != null
-						&& !partialTranslationDialog.isCursorInsideDialog()) {
-					partialTranslationDialog.dispose();
+					if (partialTranslationDialog != null
+							&& !partialTranslationDialog.isCursorInsideDialog()) {
+						partialTranslationDialog.dispose();
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	private void createDialog() {
-		int shellStyle = PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE;
 		boolean takeFocusOnOpen = false;
 		boolean persistSize = false;
 		boolean persistLocation = false;
@@ -459,7 +501,7 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 		String titleText = "Suggestions (" + SRC_LANG + " > "
 				+ targetLanguage.toUpperCase() + ")";
 		String infoText = "Ctrl+Space to display all suggestions";
-		dialog = new PopupDialog(shell, shellStyle, takeFocusOnOpen,
+		dialog = new PopupDialog(shell, SHELL_STYLE, takeFocusOnOpen,
 				persistSize, persistLocation, showDialogMenu,
 				showPersistActions, titleText, infoText) {
 
@@ -603,6 +645,28 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 		scrollComposite.setMinSize(max);
 	}
 
+	private boolean isCursorInsideTextField() {
+		if (text.isDisposed()) {
+			return false;
+		}
+
+		Display d = Display.getCurrent();
+		if (d == null) {
+			d = Display.getDefault();
+		}
+
+		Point start = text.getLocation();
+		start = text.toDisplay(start.x, start.y);
+		Point size = text.getSize();
+		Point end = new Point(size.x + start.x, size.y + start.y);
+
+		if ((d.getCursorLocation().x > end.x || d.getCursorLocation().x < start.x)
+				|| (d.getCursorLocation().y > end.y || d.getCursorLocation().y < start.y)) {
+			return false;
+		}
+		return true;
+	}
+
 	private Composite createLoadingCircle() {
 		// Create loading cicle
 		Composite loadingCircle = new Composite(composite, SWT.EMBEDDED
@@ -727,8 +791,8 @@ public class SuggestionBubble implements ISuggestionProviderListener {
 
 	/**
 	 * @see org.eclipse.babel.editor.widgets.suggestion.provider.
-	 * ISuggestionProviderListener#suggestionProviderUpdated(org.eclipse.babel
-	 * .editor.widgets.suggestion.provider.ISuggestionProvider)
+	 *      ISuggestionProviderListener#suggestionProviderUpdated(org.eclipse.babel
+	 *      .editor.widgets.suggestion.provider.ISuggestionProvider)
 	 */
 	@Override
 	public void suggestionProviderUpdated(ISuggestionProvider provider) {

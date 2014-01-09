@@ -53,6 +53,8 @@ public class PartialTranslationDialog {
 	private String infoText;
 	private String text;
 	private int orientation;
+	private boolean win;
+	private static int SHELL_STYLE;
 
 	/**
 	 * The constructor
@@ -66,6 +68,15 @@ public class PartialTranslationDialog {
 	public PartialTranslationDialog(Shell shell, SuggestionBubble parent) {
 		this.parent = parent;
 		this.shell = shell;
+
+		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+			SHELL_STYLE = PopupDialog.INFOPOPUP_SHELLSTYLE;
+			win = true;
+		} else {
+			SHELL_STYLE = PopupDialog.HOVER_SHELLSTYLE;
+			win = false;
+		}
+
 	}
 
 	private void createDialog(final int shellStyle) {
@@ -189,29 +200,28 @@ public class PartialTranslationDialog {
 			protected void configureShell(Shell shell) {
 				super.configureShell(shell);
 
-				shell.addFocusListener(new FocusListener() {
+				if (win) {
+					shell.addFocusListener(new FocusListener() {
 
-					@Override
-					public void focusGained(FocusEvent e) {
-						if (shellStyle == INFOPOPUPRESIZE_SHELLSTYLE
-								|| dialog == null) {
-							return;
+						@Override
+						public void focusGained(FocusEvent e) {
+							if (shellStyle == INFOPOPUPRESIZE_SHELLSTYLE
+									|| dialog == null) {
+								return;
+							}
+							dialog.close();
+							infoText = FOOT_NOTE_2;
+							createDialog(PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE);
+							dialog.open();
+							dialog.getShell().setFocus();
 						}
-						dialog.close();
-						infoText = FOOT_NOTE_2;
-						createDialog(PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE);
-						dialog.open();
-						dialog.getShell().setFocus();
 
-					}
-
-					@Override
-					public void focusLost(FocusEvent e) {
-					}
-
-				});
+						@Override
+						public void focusLost(FocusEvent e) {
+						}
+					});
+				}
 			}
-
 		};
 	}
 
@@ -250,7 +260,7 @@ public class PartialTranslationDialog {
 			textField.setText(text);
 		} else {
 			infoText = FOOT_NOTE_1;
-			createDialog(PopupDialog.INFOPOPUP_SHELLSTYLE);
+			createDialog(SHELL_STYLE);
 			dialog.open();
 		}
 
