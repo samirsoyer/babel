@@ -87,28 +87,28 @@ public class NullableText extends Composite {
         setLayoutData(gd);
 
         initComponents();
-        this.locale=locale;
-        
-        suggestionBubbleOn = !SuggestionProviderUtils.getSuggetionProviders()
-        						.isEmpty();
-        
-        if(suggestionBubbleOn){
-        	if(locale != null){
-        		new SuggestionBubble(text,locale.getLanguage()); 	
-        	}else{
-        		text.addModifyListener(new ModifyListener(){
-        			@Override
-        			public void modifyText(ModifyEvent e) {
-        				SuggestionBubble.setDefaultText(text.getText());
-        			}
-        		});
-        	}
-        }
-    }
-    
-    public Text getTextBox(){
-    	return this.text;
-    }
+		this.locale = locale;
+
+		suggestionBubbleOn = !SuggestionProviderUtils.getSuggetionProviders()
+				.isEmpty();
+
+		if (suggestionBubbleOn) {
+			if (locale != null) {
+				new SuggestionBubble(text, locale.getLanguage());
+			} else {
+				text.addModifyListener(new ModifyListener() {
+					@Override
+					public void modifyText(ModifyEvent e) {
+						SuggestionBubble.setDefaultText(text.getText());
+					}
+				});
+			}
+		}
+	}
+
+	public Text getTextBox() {
+		return this.text;
+	}
 
     public void setOrientation(int orientation) {
         text.setOrientation(orientation);
@@ -117,9 +117,9 @@ public class NullableText extends Composite {
     public void setText(String text) {
         isnull = text == null;
         
-        if(locale == null && suggestionBubbleOn){
-        	SuggestionBubble.setDefaultText(text);
-        }
+		if (locale == null && suggestionBubbleOn) {
+			SuggestionBubble.setDefaultText(text);
+		}
         
         if (isnull) {
             this.text.setText(""); //$NON-NLS-1$x
@@ -133,38 +133,41 @@ public class NullableText extends Composite {
         Stack<String> undoCache = (Stack<String>) this.text.getData("UNDO");
         undoCache.push(this.text.getText());
     }
-    
-    /**
-     * Sets this <code>NullableText</code> to dirty or vice versa
-     * @param dirty
-     */
-    public void setDirty(boolean dirty){
-    	this.dirty=dirty;
-    }
-    
-    /**
-	 * This method returns whether the content of this <code> NullableText</code>
-	 * have changed since the last save.
+
+	/**
+	 * Sets this <code>NullableText</code> to dirty or vice versa
+	 * 
+	 * @param dirty
+	 */
+	public void setDirty(boolean dirty) {
+		this.dirty = dirty;
+	}
+
+	/**
+	 * This method returns whether the content of this
+	 * <code> NullableText</code> have changed since the last save.
 	 * 
 	 * @return <code>true</code> if this NullableText is dirty;
 	 *         <code>false</code> otherwise.
 	 */
-    public boolean isDirty(){
-    	return dirty;
-    }
-    
-    
-    /**
-     * Applies the string to <code>NullableText</code> and makes it dirty,
-     * depending on the value of <code> dirty </code>
-     * @param text is the string to be applied to <code> NullableText </code>
-     * @param dirty whether setting text should make this 
-     * <code>NullableText</code> dirty.
-     */
-    public void setText(String text, boolean dirty){
-    	this.dirty = dirty;
-    	setText(text);
-    }
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	/**
+	 * Applies the string to <code>NullableText</code> and makes it dirty,
+	 * depending on the value of <code> dirty </code>
+	 * 
+	 * @param text
+	 *            is the string to be applied to <code> NullableText </code>
+	 * @param dirty
+	 *            whether setting text should make this
+	 *            <code>NullableText</code> dirty.
+	 */
+	public void setText(String text, boolean dirty) {
+		this.dirty = dirty;
+		setText(text);
+	}
 
     public String getText() {
         if (isnull) {

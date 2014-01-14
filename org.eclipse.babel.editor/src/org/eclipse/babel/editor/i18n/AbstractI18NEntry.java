@@ -215,18 +215,17 @@ public abstract class AbstractI18NEntry extends Composite {
             }
         });
 
-        // Handle dirtyness
-        textBox.addKeyListener(getKeyListener());
-        
-        textBox.getTextBox().addModifyListener(new ModifyListener(){
+		// Handle dirtyness
+		textBox.addKeyListener(getKeyListener());
+		textBox.getTextBox().addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
-				if(textBox.isDirty()){
+				if (textBox.isDirty()) {
 					updateModel();
 					textBox.setDirty(false);
 				}
 			}
-        });
+		});
 
         editor.addChangeListener(msgEditorUpdateKey);
     }
